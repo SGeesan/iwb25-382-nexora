@@ -10,7 +10,6 @@ const string ISSUER = "nexora";
 const string AUDIENCE = "client";
 const string CERT_FILE = "./resource/alice.crt";
 const string PRIVATE_KEY_FILE = "./resource/alice.key";
-const string SCOPE_KEY = "scp";
 
 // Microservice configuration
 const string USER_HANDLER_SERVICE_URL = "http://localhost:5000/api";
@@ -19,16 +18,21 @@ http:JwtValidatorConfig validatorConfig = {
     issuer: ISSUER,
     audience: AUDIENCE,
     signatureConfig: { certFile: CERT_FILE },
-    scopeKey: SCOPE_KEY
+    scopeKey: "role"
 };
 
-function md5Hash(string input) returns string|error {
+isolated function md5Hash(string input) returns string|error {
     byte[] inputBytes = input.toBytes();
     byte[] hashedBytes = crypto:hashMd5(inputBytes);
     return hashedBytes.toBase16();  // hex string
 }
 
-isolated function get_username_from_BearerToken(string token, jwt:ValidatorConfig validatorConfig) returns string|error {
+isolated function get_username_from_BearerToken(string token) returns string|error {
+    http:JwtValidatorConfig validatorConfig = {
+    issuer: ISSUER,
+    audience: AUDIENCE,
+    signatureConfig: { certFile: CERT_FILE },
+    scopeKey: "role"};
     if token.substring(0, 7) != "Bearer " {
         return error("Unauthorized: Invalid Authorization header format");
     }
@@ -55,14 +59,14 @@ isolated function get_username_from_BearerToken(string token, jwt:ValidatorConfi
 service / on mainListner {
 
     @http:ResourceConfig {
-        auth: [{ jwtValidatorConfig: validatorConfig, scopes: ["user"] }]
+        auth: [{ jwtValidatorConfig: validatorConfig, scopes: ["admin"] }]
     }
-    resource function get hello(@http:Header string Authorization) returns string|error {
-        string username = check get_username_from_BearerToken(Authorization, validatorConfig);
-        return "Hi " + username + ", this is a secured endpoint!";
+    isolated resource function get hello(@http:Header string Authorization) returns string|error {
+        string username = check get_username_from_BearerToken(Authorization);
+        return "Hi admin " + username + ", this is a secured endpoint!";
     }
 
-    resource function post login(map<json> details) returns json|error {
+    isolated resource function post login(map<json> details) returns json|error {
         json email = check details.email;
         string userEmail = email.toString();
         json password = check details.password;
@@ -95,7 +99,6 @@ service / on mainListner {
                     audience: AUDIENCE,
                     expTime: 3600,
                     customClaims: {
-                            [SCOPE_KEY]: "user",
                             "email": userEmail,
                             "role": userRole
                         },
