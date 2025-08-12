@@ -48,7 +48,7 @@ service / on mainListner {
         return auth:login(userEmail, userPassword);
         }
     
-    isolated resource function post register(map<json> details) returns http:Response|error {
+    isolated resource function post register(map<json> details) returns http:Response|error|error|http:Forbidden {
         //user_name, email, role, password
         json user_name = check details.user_name;
         string username = user_name.toString();
@@ -58,6 +58,11 @@ service / on mainListner {
         string userRole = role.toString();
         json password = check details.password;
         string userPassword = password.toString();
+        if userRole == "admin" {
+            // Only allow admin role to be registered by the system
+            http:Forbidden forbiddenResponse = {body: "Admin role cannot be registered by the system"};
+            return forbiddenResponse;
+        }
         return auth:register(username,userEmail,userRole,userPassword);
     }
 }
