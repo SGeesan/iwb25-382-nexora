@@ -1,7 +1,7 @@
 import User from "../models/User.js";
 
 export const registerUser = async (req, res) => {
-  const { user_name, email, role, password } = req.query;
+  const { user_name, email, role, password } = req.body;
 
   try {
     let user = await User.findOne({ email });

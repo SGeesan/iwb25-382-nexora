@@ -1,10 +1,10 @@
 import ballerina/http;
 import ballerina/jwt;
 import ballerina/crypto;
-const string ISSUER = "nexora";
-const string AUDIENCE = "client";
-const string CERT_FILE = "./resource/alice.crt";
-const string PRIVATE_KEY_FILE = "./resource/alice.key";
+configurable string ISSUER = "nexora";
+configurable string AUDIENCE = "client";
+configurable string CERT_FILE = "./resource/alice.crt";
+configurable string PRIVATE_KEY_FILE = "./resource/alice.key";
 public isolated function get_username_from_BearerToken(string token) returns string|error {
     http:JwtValidatorConfig validatorConfig = {
     issuer: ISSUER,

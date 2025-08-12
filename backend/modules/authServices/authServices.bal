@@ -4,15 +4,15 @@ import ballerina/jwt;
 import BalService.util;
 
 // JWT configuration constants
-const string ISSUER = "nexora";
-const string AUDIENCE = "client";
-const string CERT_FILE = "./resource/alice.crt";
-const string PRIVATE_KEY_FILE = "./resource/alice.key";
+configurable string ISSUER = "nexora";
+configurable string AUDIENCE = "client";
+configurable string CERT_FILE = "./resource/alice.crt";
+configurable string PRIVATE_KEY_FILE = "./resource/alice.key";
 
 // Microservice configuration
-const string USER_HANDLER_SERVICE_URL = "http://localhost:5000/api";
+configurable string USER_HANDLER_SERVICE_URL = "http://localhost:5000/api";
 
-public isolated function login(string email, string password) returns json|error {
+public isolated function login(string email, string password) returns http:NotFound|json|error {
     io:println("Attempting to login with email: " + email);
 
     http:Client mongoClient = check new (USER_HANDLER_SERVICE_URL);
@@ -50,6 +50,11 @@ public isolated function login(string email, string password) returns json|error
             string jwt = check jwt:issue(issuerConfig);
             return {"token": jwt};
         }
+        else {
+            io:println("Invalid email or password");
+            http:NotFound notFoundResponse = {body: "Invalid email or password"};
+            return notFoundResponse;
+        }
     } else {
         string res_message = "Unknown error";
         if userDetails is map<json> && userDetails.message is string {
@@ -58,4 +63,15 @@ public isolated function login(string email, string password) returns json|error
         }
         return error(res_message);
     }
+}
+
+public isolated function register(string username, string email, string role, string password) returns http:Response|error{
+    string hashedPassword = check util:md5Hash(password);
+    http:Client mongoClient = check new (USER_HANDLER_SERVICE_URL);
+    json data = {"user_name":username,
+    "password":hashedPassword,
+    "role":role,
+    "email":email};
+    http:Response response = check mongoClient->post("/user/registerUser",data);
+    return response;
 }

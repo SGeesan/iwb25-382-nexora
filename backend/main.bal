@@ -1,16 +1,16 @@
 import ballerina/http;
 import BalService.util;
-import BalService.authServices;
+import BalService.authServices as auth;
 listener http:Listener mainListner = new (9090);
 
 // JWT configuration constants
-const string ISSUER = "nexora";
-const string AUDIENCE = "client";
-const string CERT_FILE = "./resource/alice.crt";
-const string PRIVATE_KEY_FILE = "./resource/alice.key";
+configurable string ISSUER = "nexora";
+configurable string AUDIENCE = "client";
+configurable string CERT_FILE = "./resource/alice.crt";
+configurable string PRIVATE_KEY_FILE = "./resource/alice.key";
 
 // Microservice configuration
-const string USER_HANDLER_SERVICE_URL = "http://localhost:5000/api";
+// configurable string USER_HANDLER_SERVICE_URL = "http://localhost:5000/api";
 
 http:JwtValidatorConfig validatorConfig = {
     issuer: ISSUER,
@@ -39,14 +39,25 @@ service / on mainListner {
         return "Hi " + username + ", this is a secured endpoint only for admins!";
     }
 
-    isolated resource function post login(map<json> details) returns json|error {
+    isolated resource function post login(map<json> details) returns http:NotFound|json|error|error {
         json email = check details.email;
         string userEmail = email.toString();
         json password = check details.password;
         string userPassword = password.toString();
 
-        return authServices:login(userEmail, userPassword);
+        return auth:login(userEmail, userPassword);
+        }
     
-    //return error("Unauthorized: Invalid credentials");
+    isolated resource function post register(map<json> details) returns http:Response|error {
+        //user_name, email, role, password
+        json user_name = check details.user_name;
+        string username = user_name.toString();
+        json email = check details.email;
+        string userEmail = email.toString();
+        json role = check details.role;
+        string userRole = role.toString();
+        json password = check details.password;
+        string userPassword = password.toString();
+        return auth:register(username,userEmail,userRole,userPassword);
     }
 }
