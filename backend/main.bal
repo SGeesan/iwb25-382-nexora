@@ -63,7 +63,7 @@ service / on mainListner {
     }
     isolated resource function get hello(@http:Header string Authorization) returns string|error {
         string username = check get_username_from_BearerToken(Authorization);
-        return "Hi admin " + username + ", this is a secured endpoint!";
+        return "Hi " + username + ", this is a secured endpoint only for admins!";
     }
 
     isolated resource function post login(map<json> details) returns json|error {
@@ -92,9 +92,11 @@ service / on mainListner {
 
                 json Role = check userDetails.role;
                 string userRole = Role.toString();
+                json user_name = check userDetails.user_name;
+                string userName = user_name.toString();
 
                 jwt:IssuerConfig issuerConfig = {
-                    username: userEmail,
+                    username: userName,
                     issuer: ISSUER,
                     audience: AUDIENCE,
                     expTime: 3600,
