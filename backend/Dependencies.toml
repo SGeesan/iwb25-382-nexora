@@ -339,6 +339,9 @@ dependencies = [
 modules = [
 	{org = "lenovo", packageName = "BalService", moduleName = "BalService"},
 	{org = "lenovo", packageName = "BalService", moduleName = "BalService.authServices"},
+	{org = "lenovo", packageName = "BalService", moduleName = "BalService.fileServices"},
+	{org = "lenovo", packageName = "BalService", moduleName = "BalService.jobServices"},
+	{org = "lenovo", packageName = "BalService", moduleName = "BalService.llmServices"},
 	{org = "lenovo", packageName = "BalService", moduleName = "BalService.util"}
 ]
 
