@@ -4,6 +4,7 @@ import LoginPage from '../views/LoginPage.vue'
 import HomeView from '../views/HomeView.vue'
 import NotFoundView from '../views/NotFoundView.vue'
 import ForbiddenView from '../views/ForbiddenView.vue'
+import RegisterPage from '../views/RegisterPage.vue'
 
 // Helper to decode JWT payload
 function parseJwt(token) {
@@ -60,6 +61,17 @@ const router = createRouter({
         hidePlayer: false,
         requiresAuth: true,
         allowedRoles: ['admin']
+      }
+    },
+    {
+      path: '/register',
+      name: 'register',
+      component: RegisterPage,
+      meta: {
+        hideSidebar: true,
+        hideTopNav: true,
+        hidePlayer: true,
+        requiresAuth: false
       }
     },
     {
