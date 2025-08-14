@@ -14,7 +14,7 @@ const handleLogin = async () => {
     errorMessage.value = ''; // Clear previous errors
 
     try {
-        const response = await apiClient.post('api/auth/login/', {
+        const response = await apiClient.post('/login', {
             email: email.value,
             password: password.value,
         });
@@ -23,9 +23,6 @@ const handleLogin = async () => {
 
         // Store the JWT token
         localStorage.setItem('jwt_token', token);
-
-        // Store user information
-        localStorage.setItem('user_data', JSON.stringify(user));
 
         // Redirect to home page after successful login
         router.push('/home');

@@ -5,6 +5,24 @@ import HomeView from '../views/HomeView.vue'
 import NotFoundView from '../views/NotFoundView.vue'
 import ForbiddenView from '../views/ForbiddenView.vue'
 
+// Helper to decode JWT payload
+function parseJwt(token) {
+  try {
+    const base64Url = token.split('.')[1]
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    )
+    return JSON.parse(jsonPayload)
+  } catch (e) {
+    console.error('Invalid JWT:', e)
+    return null
+  }
+}
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -31,9 +49,6 @@ const router = createRouter({
         allowedRoles: ['user', 'admin']
       }
     },
-
-
-    // Admin-only route
     {
       path: '/dashboard',
       name: 'dashboard',
@@ -47,10 +62,6 @@ const router = createRouter({
         allowedRoles: ['admin']
       }
     },
-
-
-
-
     {
       path: '/forbidden',
       name: 'forbidden',
@@ -62,8 +73,6 @@ const router = createRouter({
         requiresAuth: false
       }
     },
-
-    // The CATCH-ALL ROUTE
     {
       path: '/:pathMatch(.*)*',
       name: 'NotFound',
@@ -76,65 +85,63 @@ const router = createRouter({
       }
     }
   ]
-});
+})
 
 // Global Navigation Guard
 router.beforeEach((to, from, next) => {
-  const isAuthenticated = localStorage.getItem('jwt_token'); // Check if token exists
-  const userDataString = localStorage.getItem('user_data');
-  let userRole = null;
+  const token = localStorage.getItem('jwt_token')
+  let userRole = null
 
-  if (userDataString) {
-    try {
-      const userData = JSON.parse(userDataString);
-      userRole = userData.role; // Get user role from stored data
-    } catch (e) {
-      console.error("Error parsing user data from localStorage:", e);
-      // Handle corrupted data, maybe clear it
-      localStorage.removeItem('user_data');
-      localStorage.removeItem('jwt_token');
+  if (token) {
+    const payload = parseJwt(token)
+    if (payload) {
+      // Adjust 'role' if your JWT uses a different claim name, e.g. 'roles' or inside nested objects
+      userRole = payload.role || null
+    } else {
+      // Invalid token, clear storage
+      localStorage.removeItem('jwt_token')
     }
   } else {
-      localStorage.removeItem('jwt_token');
+    // No token, ensure cleared
+    localStorage.removeItem('jwt_token')
   }
 
   // Check if the route requires authentication
   if (to.meta.requiresAuth) {
-    if (!isAuthenticated) {
-      // If not authenticated, redirect to login page
-      console.log(`Access denied: Route ${to.path} requires authentication. Redirecting to login.`);
-      next({ name: 'login' });
+    if (!token) {
+      // Not authenticated → redirect to login
+      console.log(`Access denied: Route ${to.path} requires authentication. Redirecting to login.`)
+      next({ name: 'login' })
     } else {
-      // If authenticated, check roles
+      // Authenticated, check roles if specified
       if (to.meta.allowedRoles && to.meta.allowedRoles.length > 0) {
         if (userRole && to.meta.allowedRoles.includes(userRole)) {
-          // User has the required role, proceed
-          console.log(`Access granted: User role '${userRole}' is allowed on ${to.path}.`);
-          next();
+          // Role allowed → proceed
+          console.log(`Access granted: User role '${userRole}' is allowed on ${to.path}.`)
+          next()
         } else {
-          // User does not have the required role, redirect to unauthorized or home
-          console.warn(`Access denied: User role '${userRole}' not allowed on ${to.path}. Redirecting to home.`);
-          // 403 Forbidden page or a more appropriate fallback
-          next({ name: 'forbidden' });
+          // Role not allowed → forbidden
+          console.warn(`Access denied: User role '${userRole}' not allowed on ${to.path}. Redirecting to forbidden.`)
+          next({ name: 'forbidden' })
         }
       } else {
-        // Route requires authentication but doesn't specify roles, just proceed
-        console.log(`Access granted: Route ${to.path} requires authentication, no specific roles needed.`);
-        next();
+        // No role restriction, proceed
+        console.log(`Access granted: Route ${to.path} requires authentication, no specific roles needed.`)
+        next()
       }
     }
   } else {
-    // If the route does NOT require authentication (e.g., login, public pages)
-    if (to.name === 'login' && isAuthenticated) {
-        // If user is already authenticated and tries to go to login page, redirect to home
-        console.log(`Already authenticated. Redirecting from login page to home.`);
-        next({ name: 'home' });
+    // No authentication required
+    if (to.name === 'login' && token) {
+      // Already authenticated, redirect from login to home
+      console.log(`Already authenticated. Redirecting from login page to home.`)
+      next({ name: 'home' })
     } else {
-        // For all other public routes or if not authenticated and trying to access login, proceed
-        console.log(`Proceeding to public route: ${to.path}.`);
-        next();
+      // Proceed normally
+      console.log(`Proceeding to public route: ${to.path}.`)
+      next()
     }
   }
-});
+})
 
-export default router;
+export default router
