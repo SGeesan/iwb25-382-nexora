@@ -53,7 +53,7 @@ const handleLogin = async () => {
                         id="email"
                         name="email"
                         placeholder="your@example.com"
-                        class="shadow-sm appearance-none border border-[#535353] rounded w-full py-3 px-4 text-white leading-tight focus:outline-none focus:ring-1 focus:ring-[#1ED760] bg-[#3E3E3E] placeholder-gray-400"
+                        class="shadow-sm appearance-none border border-[#535353] rounded w-full py-3 px-4 text-white leading-tight focus:outline-none focus:ring-1 focus:ring-[#2EA0C2] bg-[#3E3E3E] placeholder-gray-400"
                         v-model="email" required
                     />
                 </div>
@@ -65,7 +65,7 @@ const handleLogin = async () => {
                         id="password"
                         name="password"
                         placeholder="********"
-                        class="shadow-sm appearance-none border border-[#535353] rounded w-full py-3 px-4 text-white leading-tight focus:outline-none focus:ring-1 focus:ring-[#1ED760] bg-[#3E3E3E] placeholder-gray-400"
+                        class="shadow-sm appearance-none border border-[#535353] rounded w-full py-3 px-4 text-white leading-tight focus:outline-none focus:ring-1 focus:ring-[#2EA0C2] bg-[#3E3E3E] placeholder-gray-400"
                         v-model="password" required
                     />
                 </div>
@@ -74,10 +74,10 @@ const handleLogin = async () => {
 
                 <div class="flex items-center justify-between mb-6">
                     <label class="flex items-center text-gray-300 text-sm">
-                        <input type="checkbox" class="form-checkbox h-4 w-4 text-[#1ED760] transition duration-150 ease-in-out bg-[#3E3E3E] border-[#535353] rounded focus:ring-[#1ED760]" />
+                        <input type="checkbox" class="form-checkbox h-4 w-4 text-[#2EA0C2] transition duration-150 ease-in-out bg-[#3E3E3E] border-[#535353] rounded focus:ring-[#2EA0C2]" />
                         <span class="ml-2">Remember me</span>
                     </label>
-                    <a href="#" class="inline-block align-baseline font-bold text-sm text-[#1ED760] hover:text-[#1DB954]">
+                    <a href="#" class="inline-block align-baseline font-bold text-sm text-[#2EA0C2] hover:text-[#244284]">
                         Forgot Password?
                     </a>
                 </div>
@@ -85,7 +85,7 @@ const handleLogin = async () => {
                 <div class="flex items-center justify-center">
                     <button
                         type="submit"
-                        class="bg-[#1ED760] hover:bg-[#1DB954] text-black font-bold py-3 px-6 rounded-full focus:outline-none focus:shadow-outline w-full transition duration-200 ease-in-out"
+                        class="bg-[#2EA0C2] hover:bg-[#244284] text-white font-bold py-3 px-6 rounded-full focus:outline-none focus:shadow-outline w-full transition duration-200 ease-in-out"
                     >
                         Login
                     </button>
@@ -94,7 +94,7 @@ const handleLogin = async () => {
 
             <p class="text-center text-gray-400 text-sm mt-8">
                 Don't have an account?
-                <a href="#" class="font-bold text-[#1ED760] hover:text-[#1DB954]">Sign Up</a>
+                <a href="/register" class="font-bold text-[#2EA0C2] hover:text-[#244284]">Sign Up</a>
             </p>
         </div>
     </div>
