@@ -29,6 +29,17 @@ const router = createRouter({
   routes: [
     {
       path: '/',
+      name: 'root',
+      component: LoginPage,
+      meta: {
+        hideSidebar: true,
+        hideTopNav: true,
+        hidePlayer: true,
+        requiresAuth: false
+      }
+    },
+    {
+      path: '/login',
       name: 'login',
       component: LoginPage,
       meta: {

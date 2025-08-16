@@ -77,9 +77,6 @@ const handleLogin = async () => {
                         <input type="checkbox" class="form-checkbox h-4 w-4 text-[#2EA0C2] transition duration-150 ease-in-out bg-[#3E3E3E] border-[#535353] rounded focus:ring-[#2EA0C2]" />
                         <span class="ml-2">Remember me</span>
                     </label>
-                    <a href="#" class="inline-block align-baseline font-bold text-sm text-[#2EA0C2] hover:text-[#244284]">
-                        Forgot Password?
-                    </a>
                 </div>
 
                 <div class="flex items-center justify-center">

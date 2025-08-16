@@ -1,1 +1,5 @@
 /frontend/node_modules
+/backend/target
+/backend/pdf_server/poppler-24.08.0
+/backend/pdf_server/venv
+/backend/pdf_server/.vscode
