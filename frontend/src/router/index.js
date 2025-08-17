@@ -95,7 +95,7 @@ const router = createRouter({
         hideTopNav: false,
         hidePlayer: false,
         requiresAuth: true,
-        allowedRoles: ['admin', 'user']
+        allowedRoles: ['user']
       }
     },
     {

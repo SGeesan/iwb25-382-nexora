@@ -6,8 +6,11 @@ import MenuItem from './components/MenuItem.vue';
 
 import ChevronUp from 'vue-material-design-icons/ChevronUp.vue';
 import ChevronDown from 'vue-material-design-icons/ChevronDown.vue';
+import Menu from 'vue-material-design-icons/Menu.vue';
+import Close from 'vue-material-design-icons/Close.vue';
 
 let openMenu = ref(false)
+let showMobileNav = ref(false)
 let userRole = ref(null)
 let userName = ref(null)
 
@@ -22,9 +25,8 @@ const getUserInfo = () => {
   if (token) {
     try {
       const decodedToken = jwtDecode(token);
-      // Assuming 'user_name' is the correct claim in your JWT
       userRole.value = decodedToken.role;
-      userName.value = decodedToken.user_name; // Provide a fallback
+      userName.value = decodedToken.user_name || 'User';
       console.log('Decoded user role:', userRole.value);
       console.log('Decoded user name:', userName.value);
     } catch (error) {
@@ -42,19 +44,18 @@ const getUserInfo = () => {
 const logout = () => {
   localStorage.removeItem('jwt_token');
   userRole.value = null;
-  userName.value = null; // Clear the userName on logout
+  userName.value = null;
   router.push('/login');
 }
 
-// Watch for changes to the route to trigger a state update
 watch(
   () => route.fullPath,
   () => {
     getUserInfo();
+    showMobileNav.value = false; // Close the mobile nav on route change
   }
 );
 
-// Initial check on mount
 onMounted(() => {
   getUserInfo();
 });
@@ -62,7 +63,11 @@ onMounted(() => {
 
 <template>
   <div class="min-h-screen bg-black">
-    <div v-if="!hideSidebar()" id="SideNav" class="h-[100%] p-6 w-[240px] fixed z-50 bg-black">
+        <div 
+      v-if="showMobileNav && !hideSidebar()" 
+      id="MobileSideNav" 
+      class="fixed inset-y-0 left-0 h-full w-[240px] z-50 p-6 bg-black transform transition-transform duration-300 md:hidden"
+    >
       <RouterLink to="/home">
         <img width="180" src="/images/icons/logo.png">
       </RouterLink>
@@ -89,20 +94,52 @@ onMounted(() => {
       </ul>
     </div>
 
-    <div
+        <div v-if="!hideSidebar()" id="SideNavDesktop" class="h-full p-6 w-[240px] fixed z-50 bg-black hidden md:block">
+      <RouterLink to="/home">
+        <img width="180" src="/images/icons/logo.png">
+      </RouterLink>
+      <div class="my-8"></div>
+      <ul>
+        <RouterLink to="/home">
+          <MenuItem class="ml-[1px]" :iconSize="23" name="Home" iconString="home" pageUrl="/home" />
+        </RouterLink>
+        
+        <RouterLink v-if="userRole === 'user' || userRole === 'admin'" to="/upload">
+          <MenuItem class="ml-[1px]" :iconSize="23" name="Upload CV" iconString="pdf" pageUrl="/upload" />
+        </RouterLink> 
+
+        <RouterLink v-if="userRole === 'admin'" to="/admin-dashboard">
+          <MenuItem class="ml-[1px]" :iconSize="23" name="Admin Dashboard" iconString="settings" pageUrl="/admin-dashboard" />
+        </RouterLink>
+
+        <div class="py-3.5"></div>
+        <MenuItem class="-ml-[1px]" :iconSize="27" name="Liked" iconString="liked" pageUrl="/liked" />
+      </ul>
+      <div class="border-b border-b-gray-700"></div>
+      <ul>
+        <li class="font-semibold text-[13px] mt-3 text-gray-300 hover:text-white">ABCD</li>
+      </ul>
+    </div>
+    
+        <div
       v-if="!hideTopNav()"
       id="TopNav"
-      class="w-[calc(100%-240px)] h-[60px] fixed right-0 z-20 bg-[#101010] bg-opacity-80 flex items-center justify-between"
+      class="w-full md:w-[calc(100%-240px)] h-[60px] fixed right-0 z-20 bg-[#101010] bg-opacity-80 flex items-center justify-between"
       style="background-color: rgba(16, 16, 16, 0.8); backdrop-filter: blur(10px);"
     >
-      <div class="flex items-center ml-6"></div>
+      <div class="flex items-center ml-6">
+                <button v-if="!hideSidebar()" @click="showMobileNav = !showMobileNav" class="md:hidden">
+          <Menu v-if="!showMobileNav" fillColor="#FFFFFF" :size="25" />
+          <Close v-else fillColor="#FFFFFF" :size="25" />
+        </button>
+      </div>
 
       <button @click="openMenu = !openMenu" :class="openMenu ? 'bg-[#282828]' : 'bg-black'"
         class="bg-black hover:bg-[#282828] rounded-full p-0.5 mr-8 mt-0.5 cursor-pointer">
         <div class="flex items-center">
-                    <div class="text-white text-[14px] ml-1.5 font-semibold">{{ userName }}</div>
-          <ChevronDown v-if="!openMenu" @click="openMenu = true" fillColor="#FFFFFF" :size="25" />
-          <ChevronUp v-else @click="openMenu = false" fillColor="#FFFFFF" :size="25" />
+          <div class="text-white text-[14px] ml-1.5 font-semibold">{{ userName || 'Guest' }}</div>
+          <ChevronDown v-if="!openMenu" fillColor="#FFFFFF" :size="25" />
+          <ChevronUp v-else fillColor="#FFFFFF" :size="25" />
         </div>
       </button>
 
@@ -114,8 +151,8 @@ onMounted(() => {
       </span>
     </div>
 
-    <div
-      :class="{ 'w-full': hideSidebar(), 'w-[calc(100%-240px)]': !hideSidebar() }"
+        <div
+      :class="{ 'w-full': hideSidebar(), 'w-full md:w-[calc(100%-240px)]': !hideSidebar() }"
       class="fixed right-0 top-0 overflow-auto h-full bg-gradient-to-b from-[#000] to-black"
     >
       <div v-if="!hideTopNav()" class="mt-[70px]"></div>
