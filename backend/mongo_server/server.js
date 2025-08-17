@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import userRoutes from "./routes/userRoutes.js";
+import jobRoutes from "./routes/jobRoutes.js";
 import cors from "cors";
 import morgan from "morgan";
 
@@ -13,6 +14,7 @@ app.use(cors());
 app.use(morgan("dev"));
 
 app.use("/api/user", userRoutes);
+app.use("/api/jobs", jobRoutes);
 
 const startServer = async () => {
   try {
