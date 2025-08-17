@@ -35,7 +35,8 @@ public isolated function login(string email, string password) returns http:NotFo
                     expTime: 3600,
                     customClaims: {
                             "email": email,
-                            "role": Role
+                            "role": Role,
+                            "user_name": userName
                         },
                     signatureConfig: {config: {keyFile: PRIVATE_KEY_FILE}}
                 };
