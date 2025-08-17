@@ -18,6 +18,7 @@ public isolated function invokeLLM(io:ReadableByteChannel[]? imageInput=(), stri
         foreach io:ReadableByteChannel channel in imageInput {
             byte[] image = check channel.readAll();
             string imageEncoded = image.toBase64();
+            io:println("image has bytes:",imageEncoded.length());
             querryParts.push({
                 "inline_data": {
                     "mime_type": mime:IMAGE_JPEG,

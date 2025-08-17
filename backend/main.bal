@@ -1,7 +1,7 @@
 import BalService.authServices as auth;
 import BalService.fileServices as file;
 import BalService.jobServices as jobs;
-// import BalService.llmServices as llm;
+import BalService.llmServices as llm;
 import BalService.util;
 
 import ballerina/http;
@@ -63,7 +63,7 @@ service / on mainListner {
         // Please add @http:Header string Authorization to the function parameters to get the JWT token
         // string username = check util:get_username_from_BearerToken(Authorization); // Validate JWT and get username
         string username = "dummyUser"; // For testing purposes, replace with actual JWT validation
-        stream<byte[], io:Error?> bytes = check request.getByteStream();
+        byte[] bytes = check request.getBinaryPayload();
         return file:uploadFile(bytes, username);
     }
 
@@ -92,15 +92,14 @@ service / on mainListner {
         // imageChannel = check
         // io:openReadableFile(imagePath);
         // images.push(imageChannel);
-
-        // io:ReadableByteChannel firstImage = images[0];
-        // byte[] bytes = check firstImage.readAll();
+        // io:ReadableByteChannel imageData = images[0];
+        // byte[] bytes = check imageData.readAll();
         // check io:fileWriteBytes("test/test.jpg",bytes);
 
         // Process images to extract json data
-        // json cv = check llm:imagesToJsonCV(images);
+        json cv = check llm:imagesToJsonCV(images);
         
-        json cv = check io:fileReadJson("output.json");
+        // json cv = check io:fileReadJson("output.json");
 
         //io:println(`found details from cv:${"\n"} ${cv}`);
 
@@ -119,30 +118,30 @@ service / on mainListner {
         //io:println("available tags are:\n"+allJobTags.toString());
         
         // Get all job tags that match the CV data
-        // string[] matchingTags = check llm:getMatchingTags(allJobTags, cv);
-        string[] matchingTags = allJobTags.slice(3);
+        string[] matchingTags = check llm:getMatchingTags(allJobTags, cv);
+        // string[] matchingTags = allJobTags.slice(3);
 
         // io:println(matchingTags);
         // Get the jobs from matched tags
-        // jobs:Job[] matchedJobs = check jobs:getJobsByTags(matchingTags);
+        jobs:Job[] matchedJobs = check jobs:getJobsByTags(matchingTags);
 
-        jobs:Job[] matchedJobs = [
-        {
-            "_id": "J001",
-            "JobTitle": "Backend Developer",
-            "JobDescription": "Build and maintain server-side applications, ensuring high performance and responsiveness.",
-            "CompanyName": "CodeSphere Technologies",
-            "CreatedBy": "hr@codesphere.com",
-            "JobTags": ["Node.js", "Express", "MongoDB", "API Development"]
-        },
-        {
-            "_id": "J002",
-            "JobTitle": "Machine Learning Engineer",
-            "JobDescription": "Design, train, and deploy machine learning models for real-world applications.",
-            "CompanyName": "DataVision Labs",
-            "CreatedBy": "jobs@datavision.ai",
-            "JobTags": ["Python", "TensorFlow", "Data Science", "Model Deployment"]
-        }];
+        // jobs:Job[] matchedJobs = [
+        // {
+        //     "_id": "J001",
+        //     "JobTitle": "Backend Developer",
+        //     "JobDescription": "Build and maintain server-side applications, ensuring high performance and responsiveness.",
+        //     "CompanyName": "CodeSphere Technologies",
+        //     "CreatedBy": "hr@codesphere.com",
+        //     "JobTags": ["Node.js", "Express", "MongoDB", "API Development"]
+        // },
+        // {
+        //     "_id": "J002",
+        //     "JobTitle": "Machine Learning Engineer",
+        //     "JobDescription": "Design, train, and deploy machine learning models for real-world applications.",
+        //     "CompanyName": "DataVision Labs",
+        //     "CreatedBy": "jobs@datavision.ai",
+        //     "JobTags": ["Python", "TensorFlow", "Data Science", "Model Deployment"]
+        // }];
 
         // Rank the jobs based on the CV data
         //jobs:Job[] rankedJobs = llm:rankJobs(matchedJobs, cv);
