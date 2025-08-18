@@ -15,3 +15,5 @@ resource/private/*
 
 # Ignore certs
 resource/public/*
+
+config.toml

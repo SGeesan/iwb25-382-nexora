@@ -1,123 +1,132 @@
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-// Import your API client - adjust the import path as needed
-// import apiClient from '@/api/client'
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import apiClient from "../utils/axios"; // adjust path if needed
 
-const router = useRouter()
+const router = useRouter();
 
-// Reactive variables
-const user_name = ref('')
-const email = ref('')
-const password = ref('')
-const role = ref('user')
-const errorMessage = ref('')
+// Form fields
+const user_name = ref("");
+const email = ref("");
+const password = ref("");
+const role = ref("user");
+const errorMessage = ref("");
+const successMessage = ref("");
 
 const register = async () => {
-  errorMessage.value = ''; // Clear previous errors
+  errorMessage.value = "";
+  successMessage.value = "";
 
   try {
-      // Uncomment and adjust this when you have apiClient set up
-      const response = await apiClient.post('/register', {
-          email: email.value,
-          password: password.value,
-          user_name: user_name.value,
-          role: role.value,
-      });
+    const response = await apiClient.post("/register", {
+      user_name: user_name.value,
+      email: email.value,
+      password: password.value,
+      role: role.value,
+    });
 
+    successMessage.value = "Registration successful! Redirecting to login...";
+    console.log("Registration success:", response.data);
 
-      // Redirect to home page after successful registration
-      router.push('/');
-
-      // For now, just log the data (remove this when API is connected)
-      console.log('Registration data:', {
-          user_name: user_name.value,
-          email: email.value,
-          password: password.value,
-          role: role.value,
-      });
-
+    // Redirect after short delay
+    setTimeout(() => {
+      router.push({ name: "login" });
+    }, 1500);
   } catch (error) {
-      console.error('Registration failed:', error);
-      if (error.response && error.response.data && error.response.data.message) {
-          errorMessage.value = error.response.data.message;
-      } else {
-          errorMessage.value = 'An unexpected error occurred. Please try again.';
-      }
+    console.error("Registration failed:", error);
+    errorMessage.value =
+      error.response?.data?.message ||
+      error.response?.data?.body ||
+      "Registration failed. Please try again.";
   }
 };
 </script>
 
 <template>
-    <div class="flex items-center justify-center min-h-screen bg-black p-4">
-      <div class="w-full max-w-md bg-[#181818] rounded-lg shadow-lg p-8">
-        <h1 class="text-white text-3xl font-bold text-center mb-6">Register</h1>
-        
-        <form @submit.prevent="register">
-          <div class="mb-4">
-            <label for="user_name" class="block text-gray-300 text-sm font-semibold mb-2">User Name</label>
-            <input 
-              type="text" 
-              id="user_name"
-              v-model="user_name" 
-              placeholder="Enter your username"
-              class="shadow-sm appearance-none border border-[#535353] rounded w-full py-3 px-4 text-white leading-tight focus:outline-none focus:ring-1 focus:ring-[#2EA0C2] bg-[#3E3E3E] placeholder-gray-400"
-              required 
-            />
-          </div>
-          
-          <div class="mb-4">
-            <label for="email" class="block text-gray-300 text-sm font-semibold mb-2">Email</label>
-            <input 
-              type="email" 
-              id="email"
-              v-model="email" 
-              placeholder="your@example.com"
-              class="shadow-sm appearance-none border border-[#535353] rounded w-full py-3 px-4 text-white leading-tight focus:outline-none focus:ring-1 focus:ring-[#2EA0C2] bg-[#3E3E3E] placeholder-gray-400"
-              required 
-            />
-          </div>
-          
-          <div class="mb-4">
-            <label for="password" class="block text-gray-300 text-sm font-semibold mb-2">Password</label>
-            <input 
-              type="password" 
-              id="password"
-              v-model="password" 
-              placeholder="********"
-              class="shadow-sm appearance-none border border-[#535353] rounded w-full py-3 px-4 text-white leading-tight focus:outline-none focus:ring-1 focus:ring-[#2EA0C2] bg-[#3E3E3E] placeholder-gray-400"
-              required 
-            />
-          </div>
-          
-          <div class="mb-4">
-            <label for="role" class="block text-gray-300 text-sm font-semibold mb-2">Role</label>
-            <select 
-              id="role"
-              v-model="role"
-              class="shadow-sm appearance-none border border-[#535353] rounded w-full py-3 px-4 text-white leading-tight focus:outline-none focus:ring-1 focus:ring-[#2EA0C2] bg-[#3E3E3E]"
-            >
-              <option value="user" class="bg-[#3E3E3E] text-white">User</option>
-              <option value="company" class="bg-[#3E3E3E] text-white">Company</option>
-            </select>
-          </div>
+  <div class="flex items-center justify-center min-h-screen bg-black p-4">
+    <div class="w-full max-w-md bg-[#181818] rounded-lg shadow-lg p-8">
+      <h1 class="text-white text-3xl font-bold text-center mb-6">Register</h1>
 
-          <p v-if="errorMessage" class="text-red-500 text-sm text-center mb-4">{{ errorMessage }}</p>
-          
-          <div class="flex items-center justify-center">
-            <button 
-              type="submit"
-              class="bg-[#2EA0C2] hover:bg-[#244284] text-white font-bold py-3 px-6 rounded-full focus:outline-none focus:shadow-outline w-full transition duration-200 ease-in-out"
-            >
-              Register
-            </button>
-          </div>
-        </form>
-        
-        <p class="text-center text-gray-400 text-sm mt-8">
-          Already have an account?
-          <a href="/" class="font-bold text-[#2EA0C2] hover:text-[#244284]">Sign In</a>
+      <form @submit.prevent="register">
+        <!-- Username -->
+        <div class="mb-4">
+          <label class="block text-gray-300 text-sm font-semibold mb-2"
+            >User Name</label
+          >
+          <input
+            v-model="user_name"
+            required
+            type="text"
+            placeholder="Enter username"
+            class="w-full px-4 py-3 rounded bg-[#3E3E3E] text-white"
+          />
+        </div>
+
+        <!-- Email -->
+        <div class="mb-4">
+          <label class="block text-gray-300 text-sm font-semibold mb-2"
+            >Email</label
+          >
+          <input
+            v-model="email"
+            required
+            type="email"
+            placeholder="your@example.com"
+            class="w-full px-4 py-3 rounded bg-[#3E3E3E] text-white"
+          />
+        </div>
+
+        <!-- Password -->
+        <div class="mb-4">
+          <label class="block text-gray-300 text-sm font-semibold mb-2"
+            >Password</label
+          >
+          <input
+            v-model="password"
+            required
+            type="password"
+            placeholder="********"
+            class="w-full px-4 py-3 rounded bg-[#3E3E3E] text-white"
+          />
+        </div>
+
+        <!-- Role -->
+        <div class="mb-4">
+          <label class="block text-gray-300 text-sm font-semibold mb-2"
+            >Role</label
+          >
+          <select
+            v-model="role"
+            class="w-full px-4 py-3 rounded bg-[#3E3E3E] text-white"
+          >
+            <option value="user">User</option>
+            <option value="company">Company</option>
+          </select>
+        </div>
+
+        <!-- Error / Success messages -->
+        <p v-if="errorMessage" class="text-red-500 text-sm text-center mb-4">
+          {{ errorMessage }}
         </p>
-      </div>
+        <p v-if="successMessage" class="text-green-500 text-sm text-center mb-4">
+          {{ successMessage }}
+        </p>
+
+        <!-- Submit button -->
+        <button
+          type="submit"
+          class="bg-[#2EA0C2] hover:bg-[#244284] text-white w-full py-3 rounded-full"
+        >
+          Register
+        </button>
+      </form>
+
+      <p class="text-center text-gray-400 text-sm mt-6">
+        Already have an account?
+        <router-link to="/login" class="text-[#2EA0C2] font-bold"
+          >Sign In</router-link
+        >
+      </p>
     </div>
+  </div>
 </template>

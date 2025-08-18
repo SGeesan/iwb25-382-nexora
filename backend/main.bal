@@ -59,6 +59,9 @@ service / on mainListner {
     }
 
     // === User endpoints ===
+    @http:ResourceConfig {
+        auth: [{jwtValidatorConfig: validatorConfig, scopes: ["user"]}]
+    }
     isolated resource function post user/upload_cv(@http:Header string Authorization, http:Request request) returns http:Response|error {
         // This endpoint allows users to upload their CVs
         string username = check util:get_username_from_BearerToken(Authorization); // Validate JWT and get username

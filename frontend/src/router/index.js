@@ -6,6 +6,8 @@ import NotFoundView from '../views/NotFoundView.vue'
 import ForbiddenView from '../views/ForbiddenView.vue'
 import RegisterPage from '../views/RegisterPage.vue'
 import CVUpload from '../views/CVUpload.vue'
+import ProfileSection from '../views/ProfileSection.vue'
+
 
 // Helper to decode JWT payload
 function parseJwt(token) {
@@ -87,6 +89,17 @@ const router = createRouter({
       }
     },
     {
+      path: '/profile',
+      name: 'profile',
+      component: ProfileSection,
+      meta: {
+        hideSidebar: true,
+        hideTopNav: true,
+        hidePlayer: true,
+        requiresAuth: false
+      }
+    },
+    {
       path: '/upload',
       name: 'upload',
       component: CVUpload,
@@ -95,7 +108,7 @@ const router = createRouter({
         hideTopNav: false,
         hidePlayer: false,
         requiresAuth: true,
-        allowedRoles: ['user']
+        allowedRoles: ['user', 'admin']
       }
     },
     {
