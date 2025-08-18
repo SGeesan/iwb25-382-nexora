@@ -1,6 +1,7 @@
 import ballerina/http;
 import ballerina/jwt;
 import ballerina/crypto;
+import ballerina/mime;
 configurable string ISSUER = "nexora";
 configurable string AUDIENCE = "client";
 configurable string CERT_FILE = "./resource/alice.crt";
@@ -29,4 +30,28 @@ public isolated function md5Hash(string input) returns string|error {
     byte[] inputBytes = input.toBytes();
     byte[] hashedBytes = crypto:hashMd5(inputBytes);
     return hashedBytes.toBase16();  // hex string
+}
+
+public isolated function newPDFEntity(byte[] file, string name, string fileName) returns mime:Entity|error {
+    mime:Entity pdfBodyPart = new;
+    mime:ContentDisposition contentDisposition = new;
+    contentDisposition.name = name;
+    contentDisposition.fileName = fileName;
+    contentDisposition.disposition = "form-data";
+    pdfBodyPart.setByteArray(file);
+    pdfBodyPart.setContentDisposition(contentDisposition);
+    check pdfBodyPart.setContentType(mime:APPLICATION_PDF);
+    return pdfBodyPart;
+}
+
+public isolated function newImageEntity(byte[] image,string name, string fileName) returns mime:Entity|error {
+    mime:Entity pdfBodyPart = new;
+    mime:ContentDisposition contentDisposition = new;
+    contentDisposition.name = name;
+    contentDisposition.fileName = fileName;
+    contentDisposition.disposition = "form-data";
+    pdfBodyPart.setByteArray(image);
+    pdfBodyPart.setContentDisposition(contentDisposition);
+    check pdfBodyPart.setContentType(mime:IMAGE_JPEG);
+    return pdfBodyPart;
 }

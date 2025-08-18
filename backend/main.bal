@@ -7,7 +7,8 @@ import BalService.util;
 import ballerina/http;
 import ballerina/io;
 
-listener http:Listener mainListner = new (9090);
+configurable int PORT = 9090;
+listener http:Listener mainListner = new (PORT);
 
 // JWT configuration constants
 configurable string ISSUER = "nexora";
@@ -58,21 +59,31 @@ service / on mainListner {
     }
 
     // === User endpoints ===
-    isolated resource function post user/upload_cv(http:Request request) returns http:Response|error {
+    isolated resource function post user/upload_cv(@http:Header string Authorization, http:Request request) returns http:Response|error {
         // This endpoint allows users to upload their CVs
-        // Please add @http:Header string Authorization to the function parameters to get the JWT token
-        // string username = check util:get_username_from_BearerToken(Authorization); // Validate JWT and get username
-        string username = "dummyUser"; // For testing purposes, replace with actual JWT validation
+        string username = check util:get_username_from_BearerToken(Authorization); // Validate JWT and get username
         byte[] bytes = check request.getBinaryPayload();
         return file:uploadFile(bytes, username);
     }
 
-    isolated resource function get user/search_jobs() returns jobs:Job[]|http:NotFound|error {
-        // This endpoint allows users to search for jobs
-        // Please add @http:Header string Authorization to the function parameters to get the JWT token
-        // string username = check util:get_username_from_BearerToken(Authorization); // Validate JWT and get username
-        string username = "dummyUser"; // For testing purposes, replace with actual JWT validation
+    isolated resource function get user/get_cv_info(@http:Header string Authorization) returns file:ImageInfo|error {
+        // This endpoint allows users to get their CV UUID
+        string username = check util:get_username_from_BearerToken(Authorization); // Validate JWT and get username
+        return file:getCVInfo(username);
+    }
 
+    isolated resource function get user/get_cv_image(string path) returns http:Response|error {
+        //@http:Header string Authorization
+        //string username = check util:get_username_from_BearerToken(Authorization);
+        // Add a security check here to ensure the user has access to this CV image
+        return file:getCVImage(path);
+    }
+
+
+    isolated resource function get user/search_jobs(@http:Header string Authorization) returns jobs:Job[]|http:NotFound|error {
+        // This endpoint allows users to search for jobs
+        string username = check util:get_username_from_BearerToken(Authorization); // Validate JWT and get username
+        
         io:print("Searching jobs for user: ", username, "\n");
 
         // PDF -> images
@@ -165,6 +176,15 @@ service / on mainListner {
         // string username = check util:get_username_from_BearerToken(Authorization); // Validate JWT and get username
         string username = "dummyUser"; // For testing purposes, replace with actual JWT validation
         return jobs:getAllJobsByCreator(username);
+    }
+
+    
+    isolated resource function get company/get_all_tags() returns string[]|error {
+        // This endpoint allows users to get all job tags
+        // Please add @http:Header string Authorization to the function parameters to get the JWT token
+        // string username = check util:get_username_from_BearerToken(Authorization); // Validate JWT and get username
+        // string username = "dummyUser"; // For testing purposes, replace with actual JWT validation
+        return jobs:getAllJobTags();
     }
 
     // === Admin endpoints ===

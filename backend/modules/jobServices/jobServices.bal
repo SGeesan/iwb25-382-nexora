@@ -8,7 +8,7 @@ public isolated function createJob(JobPost newJob, string username) returns http
 }
 
 public isolated function getAllJobTags() returns string[]|error {
-    string[] jobTags =[];
+    string[] jobTags =["dummyTag1", "dummyTag2", "dummyTag3", "dummyTag4"];
 
     // Logic to retrieve all jobs
     return jobTags;

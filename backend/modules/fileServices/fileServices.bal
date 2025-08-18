@@ -1,26 +1,15 @@
 import ballerina/http;
 import ballerina/io;
 import ballerina/mime;
+import BalService.util;
 
 configurable string USER_HANDLER_SERVICE_URL = "http://localhost:5000/api";
 configurable string FILE_HANDLER_SERVICE_URL = "http://localhost:8000";
 
-type ImageInfo record {
+public type ImageInfo record {
     int page_count;
     string[] images;
 };
-
-isolated function newPDFEntity(byte[] file) returns mime:Entity|error {
-    mime:Entity pdfBodyPart = new;
-    mime:ContentDisposition contentDisposition = new;
-    contentDisposition.name = "pdf";
-    contentDisposition.fileName = "CV.pdf";
-    contentDisposition.disposition = "form-data";
-    pdfBodyPart.setByteArray(file);
-    pdfBodyPart.setContentDisposition(contentDisposition);
-    check pdfBodyPart.setContentType(mime:APPLICATION_PDF);
-    return pdfBodyPart;
-}
 
 public isolated function uploadFile(byte[] file, string username) returns http:Response|error {
     // This function is a placeholder for the file upload logic
@@ -28,7 +17,7 @@ public isolated function uploadFile(byte[] file, string username) returns http:R
     http:Client fileClient = check new (FILE_HANDLER_SERVICE_URL,httpVersion = "1.1");
     
     // Creat Multipart request with PDF file
-    mime:Entity pdfBodyPart = check newPDFEntity(file);
+    mime:Entity pdfBodyPart = check util:newPDFEntity(file,"pdf","cv.pdf");
     mime:Entity[] parts= [pdfBodyPart];
     http:Request request = new;
     request.setBodyParts(parts);
@@ -62,4 +51,25 @@ public isolated function getCVasImages(string username) returns io:ReadableByteC
         images.push(check io:createReadableChannel(imageBytes));
     }
     return images;
+}
+
+public isolated function getCVImage(string path) returns error|http:Response{
+    // This function retrieves a specific CV image by its path
+    http:Client fileClient = check new (FILE_HANDLER_SERVICE_URL,httpVersion = "1.1");
+    http:Response response = check fileClient->get(path);
+    byte[] imageBytes = check response.getBinaryPayload();
+    http:Response Balresponse = new;
+    Balresponse.setPayload(imageBytes);
+    check Balresponse.setContentType(mime:IMAGE_JPEG);
+    return Balresponse;
+}
+
+public isolated function getCVInfo(string username) returns ImageInfo|error {
+    // This function retrieves the UUID of the user's CV
+    http:Client mongoClient = check new (USER_HANDLER_SERVICE_URL);
+    json result = check mongoClient->/cv/getCV.get(params = { "user_name": username });
+    string uuid = check result.uuid;
+    http:Client fileClient = check new (FILE_HANDLER_SERVICE_URL,httpVersion = "1.1");
+    ImageInfo info = check fileClient->get("/pdf/"+uuid);
+    return info;
 }
