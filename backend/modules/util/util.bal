@@ -2,6 +2,7 @@ import ballerina/http;
 import ballerina/jwt;
 import ballerina/crypto;
 import ballerina/mime;
+import BalService.jobServices as jobs;
 configurable string ISSUER = "nexora";
 configurable string AUDIENCE = "client";
 configurable string CERT_FILE = "./resource/alice.crt";
@@ -54,4 +55,13 @@ public isolated function newImageEntity(byte[] image,string name, string fileNam
     pdfBodyPart.setContentDisposition(contentDisposition);
     check pdfBodyPart.setContentType(mime:IMAGE_JPEG);
     return pdfBodyPart;
+}
+
+public isolated function getJobByID(jobs:Job[] jobList, string jobId) returns jobs:Job|error {
+    foreach jobs:Job job in jobList {
+        if job._id == jobId {
+            return job;
+        }
+    }
+    return error("Job with ID " + jobId + " not found in the provided list.");
 }

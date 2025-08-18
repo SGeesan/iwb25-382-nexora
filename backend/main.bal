@@ -59,6 +59,9 @@ service / on mainListner {
     }
 
     // === User endpoints ===
+    @http:ResourceConfig {
+        auth: [{jwtValidatorConfig: validatorConfig, scopes: ["user"]}]
+    }
     isolated resource function post user/upload_cv(@http:Header string Authorization, http:Request request) returns http:Response|error {
         // This endpoint allows users to upload their CVs
         string username = check util:get_username_from_BearerToken(Authorization); // Validate JWT and get username
@@ -66,12 +69,18 @@ service / on mainListner {
         return file:uploadFile(bytes, username);
     }
 
+    @http:ResourceConfig {
+        auth: [{jwtValidatorConfig: validatorConfig, scopes: ["user"]}]
+    }
     isolated resource function get user/get_cv_info(@http:Header string Authorization) returns file:ImageInfo|error {
         // This endpoint allows users to get their CV UUID
         string username = check util:get_username_from_BearerToken(Authorization); // Validate JWT and get username
         return file:getCVInfo(username);
     }
 
+    @http:ResourceConfig {
+        auth: [{jwtValidatorConfig: validatorConfig, scopes: ["user"]}]
+    }
     isolated resource function get user/get_cv_image(string path) returns http:Response|error {
         //@http:Header string Authorization
         //string username = check util:get_username_from_BearerToken(Authorization);
@@ -93,97 +102,48 @@ service / on mainListner {
             return notFoundResponse;
         }
 
-        // io:ReadableByteChannel[] images = [];
-        // string imagePath = "CV.jpg";
-        // io:ReadableByteChannel imageChannel = check
-        // io:openReadableFile(imagePath);
-        // images.push(imageChannel);
-
-        // imagePath = "CV2.jpg";
-        // imageChannel = check
-        // io:openReadableFile(imagePath);
-        // images.push(imageChannel);
-        // io:ReadableByteChannel imageData = images[0];
-        // byte[] bytes = check imageData.readAll();
-        // check io:fileWriteBytes("test/test.jpg",bytes);
-
         // Process images to extract json data
         json cv = check llm:imagesToJsonCV(images);
-        
-        // json cv = check io:fileReadJson("output.json");
-
-        //io:println(`found details from cv:${"\n"} ${cv}`);
 
         // Get all job tags in the system
-        //string[] allJobTags = check jobs:getAllJobTags();
-
-        string[] allJobTags = ["Software Development",
-        "Full-Time",
-        "Remote",
-        "C#",
-        "ASP.NET",
-        "Team Collaboration",
-        "Agile",
-        "Problem Solving"];
-
-        //io:println("available tags are:\n"+allJobTags.toString());
+        string[] allJobTags = check jobs:getAllJobTags();
         
         // Get all job tags that match the CV data
-        string[] matchingTags = check llm:getMatchingTags(allJobTags, cv);
-        // string[] matchingTags = allJobTags.slice(3);
+        string[] matchingTags = allJobTags.slice(3);
 
-        // io:println(matchingTags);
         // Get the jobs from matched tags
         jobs:Job[] matchedJobs = check jobs:getJobsByTags(matchingTags);
 
-        // jobs:Job[] matchedJobs = [
-        // {
-        //     "_id": "J001",
-        //     "JobTitle": "Backend Developer",
-        //     "JobDescription": "Build and maintain server-side applications, ensuring high performance and responsiveness.",
-        //     "CompanyName": "CodeSphere Technologies",
-        //     "CreatedBy": "hr@codesphere.com",
-        //     "JobTags": ["Node.js", "Express", "MongoDB", "API Development"]
-        // },
-        // {
-        //     "_id": "J002",
-        //     "JobTitle": "Machine Learning Engineer",
-        //     "JobDescription": "Design, train, and deploy machine learning models for real-world applications.",
-        //     "CompanyName": "DataVision Labs",
-        //     "CreatedBy": "jobs@datavision.ai",
-        //     "JobTags": ["Python", "TensorFlow", "Data Science", "Model Deployment"]
-        // }];
-
         // Rank the jobs based on the CV data
-        //jobs:Job[] rankedJobs = llm:rankJobs(matchedJobs, cv);
-        jobs:Job[] rankedJobs = matchedJobs;
+        jobs:Job[] rankedJobs = check llm:rankJobs(matchedJobs, cv);
 
         return rankedJobs;
     }
 
     // ==== Company endpoints ====
-    isolated resource function post company/create_job(jobs:JobPost newJob) returns http:Response|error {
+    @http:ResourceConfig {
+        auth: [{jwtValidatorConfig: validatorConfig, scopes: ["company"]}]
+    }
+    isolated resource function post company/create_job(@http:Header string Authorization, jobs:JobPost newJob) returns http:Response|error {
         // This endpoint allows companies to create jobs
-        // Please add @http:Header string Authorization to the function parameters to get the JWT token
-        // string username = check util:get_username_from_BearerToken(Authorization); // Validate JWT and get username
-        string username = "dummyUser"; // For testing purposes, replace with actual JWT validation
+        string username = check util:get_username_from_BearerToken(Authorization); // Validate JWT and get username
         return jobs:createJob(newJob, username);
     }
 
-    isolated resource function get company/get_all_jobs() returns jobs:Job[]|error {
+    @http:ResourceConfig {
+        auth: [{jwtValidatorConfig: validatorConfig, scopes: ["company"]}]
+    }
+    isolated resource function get company/get_all_jobs(@http:Header string Authorization) returns jobs:Job[]|error {
         // This endpoint allows users to get all job tags
-        // Please add @http:Header string Authorization to the function parameters to get the JWT token
-        // string username = check util:get_username_from_BearerToken(Authorization); // Validate JWT and get username
-        string username = "dummyUser"; // For testing purposes, replace with actual JWT validation
+        string username = check util:get_username_from_BearerToken(Authorization); // Validate JWT and get username
         return jobs:getAllJobsByCreator(username);
     }
 
-    
+    @http:ResourceConfig {
+        auth: [{jwtValidatorConfig: validatorConfig, scopes: ["company"]}]
+    }
     isolated resource function get company/get_all_tags() returns string[]|error {
         // This endpoint allows users to get all job tags
-        // Please add @http:Header string Authorization to the function parameters to get the JWT token
-        // string username = check util:get_username_from_BearerToken(Authorization); // Validate JWT and get username
-        // string username = "dummyUser"; // For testing purposes, replace with actual JWT validation
         return jobs:getAllJobTags();
     }
 
