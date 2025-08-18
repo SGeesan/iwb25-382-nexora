@@ -1,0 +1,130 @@
+{
+    "personal_information": {
+      "name": "Sugith Geesan Munasinghe",
+      "contact": {
+        "phone": "0741805545",
+        "email": "sugithgeesan@gmail.com",
+        "linkedin": "Sugith Geesan Munasinghe",
+        "other": "SGeesan",
+        "address": "224/B, Udugampola"
+      }
+    },
+    "summary": "As a Computer Science and Engineering undergraduate, I am passionate about building reliable, well-designed systems and exploring Artificial Intelligence. I enjoy solving real-world problems through clean architecture and scalable code, and I am eager to contribute to projects that deliver meaningful and useful software solutions.",
+    "skills": {
+      "languages": "Java, Python, Ballerina, JavaScript, C/C++",
+      "backend_technologies": "Express.js, FastAPI, MySQL, MongoDB",
+      "frontend_technologies": "JavaScript, React",
+      "generative_ai_llms": "LangChain, Google GenAI",
+      "development_tools": "GitHub, VS Code, Postman"
+    },
+    "education": [
+      {
+        "degree": "Bsc. Engineering(Hons) Undergraduate",
+        "institution": "Department of Computer Science & Engineering, University of Moratuwa",
+        "dates": "Feb 2023 ? present",
+        "details": [
+          "CGPA 3.85",
+          "Semester 2 SGPA 3.95 (Dean's List)",
+          "Semester 1 SGPA 3.94 (Dean's List)"
+        ]
+      },
+      {
+        "degree": "GCE A/L 2021(22)",
+        "institution": "Bandaranayaka College Gampaha",
+        "dates": "Oct 2019 ? Mar 2022",
+        "details": [
+          "Results 3 A Grades",
+          "Subjects Combined Mathematics, Physics, Chemistry",
+          "District Rank 4",
+          "Island Rank 109"
+        ]
+      },
+      {
+        "degree": "GCE O/L 2018",
+        "institution": "Bandaranayaka College Gampaha",
+        "dates": "Jan 2013 ? Dec 2018",
+        "details": [
+          "Result 9 A Grades"
+        ]
+      }
+    ],
+    "projects": [
+      {
+        "title": "MatchCV",
+        "dates": "Jul 2025 ?Ongoing",
+        "description": "This is a web-based system that matches job positions with individuals' CVs to help them find suitable opportunities. It uses Google GenAI to classify CVs into relevant fields. I am currently contributing to the development of parts of the Ballerina service, which serves as the main entry point in this microservice-based system.",
+        "techstack": "Ballerina, Node.js, FastAPI, MongoDB, Google GenAI, Veu"
+      },
+      {
+        "title": "Automatic MCQ Grader",
+        "dates": "Jul 2025 ? Ongoing",
+        "description": "This is a web-based system that automatically grades MCQ bubble sheets and detects student index numbers. It uses image processing and OCR technologies, leveraging OpenCV and other text recognition models. I am developing the OCR microservice and the main backend service.",
+        "techstack": "Next.js, FastAPI, MySQL, OpenCV"
+      },
+      {
+        "title": "NOC-Connect Web App",
+        "dates": "Apr 2025",
+        "description": "This is a web-based system that enables sponsors to search for talented athletes and connect with them, targeting support for the National Olympic Committee of Sri Lanka. I developed the chatbot backend component using JavaScript.",      
+        "techstack": "Node.js, Express.js, MongoDB, GoogleGenAI, React",
+        "repository": "View Repository"
+      },
+      {
+        "title": "RPAL Language Interpreter",
+        "dates": "Apr 2025 ? Jun 2025",
+        "description": "This is a comprehensive command-line interpreter for the RPAL programming language(Right-reference Pedagogic Algorithmic Language), a functional programming language used primarily for teaching programming concepts. This interpreter parses RPAL programs through multiple stages. I contributed by developing the Parser and Abstract Syntax Tree components.",
+        "techstack": "Java, Maven",
+        "repository": "View Repository"
+      }
+    ],
+    "competitions_hackathons_events": [
+      {
+        "title": "Top 10 - SpiritX 2025 Development Competition",
+        "dates": "April 2025",
+        "institution": "MoruSpirit 360"
+      },
+      {
+        "title": "Applied Data Science and Artificial Intelligence (ADSAI) Symposium 2025",
+        "dates": "April 2025",
+        "institution": "Department of Computer Science and Engineering, University of Moratuwa"
+      },
+      {
+        "title": "Finalist - DevQuest, CODEFEST 2024",
+        "dates": "Jan 2025",
+        "institution": "Sri Lanka Institute of Information Technology"
+      },
+      {
+        "title": "Innovate with Ballerina Coding Challenge 2024",
+        "dates": "Nov 2024",
+        "institution": "WSO2"
+      }
+    ],
+    "leadership_memberships": [
+      {
+        "title": "Logistic Committee Member",
+        "dates": "Nov 2024 - April 2025",
+        "organization": "SLIOT Challenge 2025 - University of Moratuwa"
+      },
+      {
+        "title": "Student Member",
+        "dates": "Mar 2024 - present",
+        "organization": "Institute of Engineers Sri Lanka"
+      },
+      {
+        "title": "Volunteer",
+        "dates": "Sept 2023 - present",
+        "organization": "Sasnaka Sansada"
+      }
+    ],
+    "references": [
+      {
+        "name": "Dr. Adeesha Wijayasiri",
+        "title": "Senior Lecturer, Department of Computer Science & Engineering, University of Moratuwa",
+        "email": "adeeshaw@cse.mrt.ac.lk"
+      },
+      {
+        "name": "Prof. Dulani Meedeniya",
+        "title": "Senior Lecturer, Department of Computer Science & Engineering, University of Moratuwa",
+        "email": "dulanim@cse.mrt.ac.lk"
+      }
+    ]
+  }

@@ -1,5 +1,5 @@
 public type Job record {|
-    string JobId;
+    string _id;
     string JobTitle;
     string JobDescription;
     string CompanyName;
