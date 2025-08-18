@@ -32,7 +32,7 @@ const goBack = () => {
       </button>
       <button
         @click="goBack"
-        class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-full focus:outline-none focus:shadow-outline transition duration-200 ease-in-out"
+        class="bg-[#2EA0C2] hover:bg-[#244284] text-white font-bold py-3 px-6 rounded-full focus:outline-none focus:shadow-outline transition duration-200 ease-in-out"
       >
         Go Back
       </button>

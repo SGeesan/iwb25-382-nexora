@@ -34,7 +34,7 @@ import { RouterLink } from 'vue-router';
       </div>
     </div>
 
-    <div class="mt-20 py-16">
+    <div class="">
       <h2 class="text-4xl font-bold text-center mb-12">How It Works</h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
         <div class="flex flex-col items-center text-center p-6 bg-gray-800 rounded-lg shadow-lg transform hover:scale-105 transition duration-300">
