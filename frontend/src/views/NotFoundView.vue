@@ -17,8 +17,8 @@ const goHome = () => {
     </p>
     <button
       @click="goHome"
-      class="bg-[#1ED760] hover:bg-[#1DB954] text-black font-bold py-3 px-6 rounded-full focus:outline-none focus:shadow-outline transition duration-200 ease-in-out"
-    >
+      class="bg-[#2EA0C2] hover:bg-[#244284] text-white font-bold py-3 px-6 rounded-full focus:outline-none focus:shadow-outline transition duration-200 ease-in-out"
+    >        
       Go to Home Page
     </button>
   </div>
