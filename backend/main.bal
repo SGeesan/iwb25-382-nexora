@@ -109,7 +109,7 @@ service / on mainListner {
         string[] allJobTags = check jobs:getAllJobTags();
         
         // Get all job tags that match the CV data
-        string[] matchingTags = allJobTags.slice(3);
+        string[] matchingTags = check llm:getMatchingTags(allJobTags,cv);
 
         // Get the jobs from matched tags
         jobs:Job[] matchedJobs = check jobs:getJobsByTags(matchingTags);
