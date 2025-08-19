@@ -1,15 +1,20 @@
 import ballerina/http;
 
+configurable string USER_HANDLER_SERVICE_URL = "http://localhost:5000/api";
+
 public isolated function createJob(JobPost newJob, string username) returns http:Response|error {
-    http:Response response = new;
-    response.statusCode = 200;
-    response.setJsonPayload({"message": "Job created successfully by " + username});
+    json payload = {...newJob,
+        "CompanyName": username
+    };
+    http:Client mongoClient = check new http:Client(USER_HANDLER_SERVICE_URL);
+    http:Response response = check mongoClient->/addNewJob.post(payload);
     return response;
 }
 
 public isolated function getAllJobTags() returns string[]|error {
-    string[] jobTags =["dummyTag1", "dummyTag2", "dummyTag3", "dummyTag4"];
-
+    http:Client mongoClient = check new http:Client(USER_HANDLER_SERVICE_URL);
+    Tags tags = check mongoClient->/jobs/getAllTags.get();
+    string[] jobTags = tags.tags;
     // Logic to retrieve all jobs
     return jobTags;
 }
@@ -27,7 +32,6 @@ public isolated function getAllJobsByCreator(string username) returns Job[]|erro
             "JobTitle": "Backend Developer",
             "JobDescription": "Build and maintain server-side applications, ensuring high performance and responsiveness.",
             "CompanyName": "CodeSphere Technologies",
-            "CreatedBy": "hr@codesphere.com",
             "JobTags": ["Node.js", "Express", "MongoDB", "API Development"]
         },
         {
@@ -35,7 +39,6 @@ public isolated function getAllJobsByCreator(string username) returns Job[]|erro
             "JobTitle": "Machine Learning Engineer",
             "JobDescription": "Design, train, and deploy machine learning models for real-world applications.",
             "CompanyName": "DataVision Labs",
-            "CreatedBy": "jobs@datavision.ai",
             "JobTags": ["Python", "TensorFlow", "Data Science", "Model Deployment"]
         }
     ];
