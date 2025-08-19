@@ -1,13 +1,18 @@
-import CV from '../models/CV.js';
+import CV from "../models/CV.js";
 export const addNewCV = async (req, res) => {
-    const cvData = req.body;
-    const newCV = new CV(cvData);
-    try {
-        const savedCV = await newCV.save();
-        res.status(201).json({ "_id": savedCV._id });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+  const { user_name, file_uuid } = req.body;
+
+  try {
+    const savedCV = await CV.findOneAndUpdate(
+      { user_name },                       // find by username
+      { $set: { file_uuid } },             // update file_uuid
+      { new: true, upsert: true }          // return updated doc, create if not exists
+    );
+
+    res.status(201).json({ "_id": savedCV._id });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
 export const getCVByUsername = async (req, res) => {

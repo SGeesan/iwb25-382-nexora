@@ -20,9 +20,12 @@ public isolated function getAllJobTags() returns string[]|error {
 }
 
 public isolated function getJobsByTags(string[] tags) returns Job[]|error {
-    
-    // Logic to retrieve jobs by tags
-    return [];
+    http:Client mongoClient = check new http:Client(USER_HANDLER_SERVICE_URL);
+    if tags.length() == 0 {
+        return [];
+    }
+    json payload = {"tags": tags};
+    return check mongoClient->/jobs/getJobsByTags.post(payload);
 }
 
 public isolated function getAllJobsByCreator(string username) returns Job[]|error {

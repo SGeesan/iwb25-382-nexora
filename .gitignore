@@ -3,3 +3,5 @@
 /backend/pdf_server/poppler-24.08.0
 /backend/pdf_server/venv
 /backend/pdf_server/.vscode
+/backend/pdf_server/uploads
+/backend/pdf_server/output
