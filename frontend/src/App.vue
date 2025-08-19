@@ -68,9 +68,7 @@ onMounted(() => {
       id="MobileSideNav" 
       class="fixed inset-y-0 left-0 h-full w-[240px] z-50 p-6 bg-black transform transition-transform duration-300 md:hidden"
     >
-      <RouterLink to="/home">
-        <img width="180" src="/images/icons/logo.png">
-      </RouterLink>
+      <img width="180" src="/images/icons/logo.png">
       <div class="my-8"></div>
       <ul>
         <!-- User -->
@@ -78,6 +76,11 @@ onMounted(() => {
           <MenuItem class="ml-[1px]" :iconSize="23" name="Home" iconString="home" pageUrl="/home" />
         </RouterLink>
         
+
+        <RouterLink v-if="userRole === 'user'" to="/jobs">
+          <MenuItem class="ml-[1px]" :iconSize="23" name="Search jobs" iconString="pdf" pageUrl="/jobs" />
+        </RouterLink>       
+
 
         <!-- Company -->
         <RouterLink v-if="userRole === 'company'" to="/company-home">
@@ -105,10 +108,8 @@ onMounted(() => {
       </ul>
     </div>
 
-        <div v-if="!hideSidebar()" id="SideNavDesktop" class="h-full p-6 w-[240px] fixed z-50 bg-black hidden md:block">
-      <RouterLink to="/home">
-        <img width="180" src="/images/icons/logo.png">
-      </RouterLink>
+      <div v-if="!hideSidebar()" id="SideNavDesktop" class="h-full p-6 w-[240px] fixed z-50 bg-black hidden md:block">
+      <img width="180" src="/images/icons/logo.png">
       <div class="my-8"></div>
       <ul>
         <!-- User -->
@@ -118,8 +119,11 @@ onMounted(() => {
 
         <RouterLink v-if="userRole === 'user'" to="/upload">
           <MenuItem class="ml-[1px]" :iconSize="23" name="Upload CV" iconString="pdf" pageUrl="/upload" />
-        </RouterLink> 
-        
+        </RouterLink>
+
+        <RouterLink v-if="userRole === 'user'" to="/jobs">
+          <MenuItem class="ml-[1px]" :iconSize="23" name="Search jobs" iconString="pdf" pageUrl="/jobs" />
+        </RouterLink>         
 
         <!-- Company -->
         <RouterLink v-if="userRole === 'company'" to="/company-home">

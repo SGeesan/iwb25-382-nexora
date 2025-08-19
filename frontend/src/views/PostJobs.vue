@@ -1,37 +1,27 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { XMarkIcon } from '@heroicons/vue/24/outline'; // Importing an icon for removing tags
+import apiClient from '../utils/axios'; // Adjust path if needed
 
 const jobTitle = ref("");
 const jobDescription = ref("");
 const selectedTags = ref([]);
+const availableTags = ref([]);
 const searchTerm = ref("");
 const showTagsDropdown = ref(false);
+const postStatus = ref(null); // 'success', 'error' or null
 
-// A predefined list of available tags for demonstration
-const availableTags = ref([
-  "JavaScript",
-  "React",
-  "Node.js",
-  "Vue.js",
-  "Python",
-  "Go",
-  "AWS",
-  "Docker",
-  "Kubernetes",
-  "TypeScript",
-  "Tailwind CSS",
-  "PostgreSQL",
-  "MongoDB",
-  "GraphQL",
-  "Rest API",
-  "CI/CD",
-  "Figma",
-  "UI/UX",
-  "Svelte",
-  "Angular",
-  "Ruby on Rails",
-]);
+// Function to fetch the available tags from the backend
+const fetchTags = async () => {
+  try {
+    const response = await apiClient.get('/company/get_all_tags');
+    // The API returns an array directly, not an object with a 'tags' property.
+    availableTags.value = response.data || [];
+  } catch (error) {
+    console.error('Failed to fetch tags:', error);
+    // You could set a local error message here if needed
+  }
+};
 
 // Computed property to filter the available tags based on the search term
 const filteredTags = computed(() => {
@@ -59,21 +49,33 @@ const removeTag = (tagToRemove) => {
 };
 
 // Function to handle form submission
-const handleSubmit = () => {
+const handleSubmit = async () => {
+  postStatus.value = null; // Reset status
+  // Update the payload to match the backend's expected format
   const formData = {
-    title: jobTitle.value,
-    description: jobDescription.value,
-    tags: selectedTags.value,
+    JobTitle: jobTitle.value,
+    JobDescription: jobDescription.value,
+    JobTags: selectedTags.value,
   };
-  console.log("Submitting job post:", formData);
-  // Here you would typically send the data to your backend API
-  alert("Job post submitted! Check the console for the form data.");
-
-  // Reset the form
-  jobTitle.value = "";
-  jobDescription.value = "";
-  selectedTags.value = [];
+  
+  try {
+    const response = await apiClient.post('/company/create_job', formData);
+    console.log("Job post successful:", response.data);
+    postStatus.value = 'success';
+    
+    // Reset the form
+    jobTitle.value = "";
+    jobDescription.value = "";
+    selectedTags.value = [];
+    
+  } catch (error) {
+    console.error('Job post failed:', error);
+    postStatus.value = 'error';
+  }
 };
+
+// Fetch tags when the component is first loaded
+onMounted(fetchTags);
 </script>
 
 <template>
@@ -160,6 +162,12 @@ const handleSubmit = () => {
             </div>
             <p v-if="filteredTags.length === 0 && searchTerm" class="mt-2 text-gray-400 text-sm">No matching tags found.</p>
           </div>
+        </div>
+
+        <!-- Submission Status Message -->
+        <div v-if="postStatus" :class="{'text-green-400': postStatus === 'success', 'text-red-400': postStatus === 'error'}" class="text-center font-medium mt-4">
+          <p v-if="postStatus === 'success'">Job post submitted successfully!</p>
+          <p v-if="postStatus === 'error'">Failed to submit job post. Please try again.</p>
         </div>
 
         <!-- Submit Button -->

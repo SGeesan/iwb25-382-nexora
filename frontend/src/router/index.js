@@ -9,6 +9,7 @@ import CVUpload from '../views/CVUpload.vue'
 import ProfileSection from '../views/ProfileSection.vue'
 import PostJob from '../views/PostJobs.vue'
 import CompanyHome from '../views/CompanyHome.vue'
+import SearchJobs from '../views/ShowJobs.vue'
 
 // Helper to decode JWT payload
 function parseJwt(token) {
@@ -63,6 +64,30 @@ const router = createRouter({
         hidePlayer: false,
         requiresAuth: true,
         allowedRoles: ['user', 'admin']
+      }
+    },
+    {
+      path: '/upload',
+      name: 'upload',
+      component: CVUpload,
+      meta: {
+        hideSidebar: false,
+        hideTopNav: false,
+        hidePlayer: false,
+        requiresAuth: true,
+        allowedRoles: ['user', 'admin']
+      }
+    },
+    {
+      path: '/jobs',
+      name: 'jobs',
+      component: SearchJobs,
+      meta: {
+        hideSidebar: false,
+        hideTopNav: false,
+        hidePlayer: false,
+        requiresAuth: true,
+        allowedRoles: ['user']
       }
     },
     {
@@ -122,18 +147,6 @@ const router = createRouter({
         hideTopNav: true,
         hidePlayer: true,
         requiresAuth: false
-      }
-    },
-    {
-      path: '/upload',
-      name: 'upload',
-      component: CVUpload,
-      meta: {
-        hideSidebar: false,
-        hideTopNav: false,
-        hidePlayer: false,
-        requiresAuth: true,
-        allowedRoles: ['user', 'admin']
       }
     },
     {
