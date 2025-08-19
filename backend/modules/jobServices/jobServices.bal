@@ -7,7 +7,7 @@ public isolated function createJob(JobPost newJob, string username) returns http
         "CompanyName": username
     };
     http:Client mongoClient = check new http:Client(USER_HANDLER_SERVICE_URL);
-    http:Response response = check mongoClient->/addNewJob.post(payload);
+    http:Response response = check mongoClient->/jobs/addNewJob.post(payload);
     return response;
 }
 
