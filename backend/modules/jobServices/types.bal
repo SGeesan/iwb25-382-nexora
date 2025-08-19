@@ -3,13 +3,15 @@ public type Job record {|
     string JobTitle;
     string JobDescription;
     string CompanyName;
-    string CreatedBy;
     string[] JobTags;
 |};
 
 public type JobPost record {|
     string JobTitle;
     string JobDescription;
-    string CompanyName;
     string[] JobTags;
 |};
+
+type Tags record {
+    string[] tags;
+};
