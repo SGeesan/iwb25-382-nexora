@@ -73,11 +73,24 @@ onMounted(() => {
       </RouterLink>
       <div class="my-8"></div>
       <ul>
-        <RouterLink to="/home">
+        <!-- User -->
+        <RouterLink v-if="userRole === 'user'" to="/home">
           <MenuItem class="ml-[1px]" :iconSize="23" name="Home" iconString="home" pageUrl="/home" />
         </RouterLink>
         
-        <RouterLink v-if="userRole === 'user' || userRole === 'admin'" to="/upload">
+
+        <!-- Company -->
+        <RouterLink v-if="userRole === 'company'" to="/company-home">
+          <MenuItem class="ml-[1px]" :iconSize="23" name="Home" iconString="home" pageUrl="/company-home" />
+        </RouterLink>
+
+        <RouterLink v-if="userRole === 'company'" to="/post-jobs">
+          <MenuItem class="ml-[1px]" :iconSize="23" name="Post Job" iconString="home" pageUrl="/post-jobs" />
+        </RouterLink>
+
+
+
+        <RouterLink v-if="userRole === 'user'" to="/upload">
           <MenuItem class="ml-[1px]" :iconSize="23" name="Upload CV" iconString="pdf" pageUrl="/upload" />
         </RouterLink> 
 
@@ -85,12 +98,10 @@ onMounted(() => {
           <MenuItem class="ml-[1px]" :iconSize="23" name="Admin Dashboard" iconString="settings" pageUrl="/admin-dashboard" />
         </RouterLink>
 
-        <div class="py-3.5"></div>
-        <MenuItem class="-ml-[1px]" :iconSize="27" name="Liked" iconString="liked" pageUrl="/liked" />
-      </ul>
-      <div class="border-b border-b-gray-700"></div>
-      <ul>
-        <li class="font-semibold text-[13px] mt-3 text-gray-300 hover:text-white">ABCD</li>
+        <RouterLink v-if="userRole === 'admin'" to="/admin-dashboard">
+          <MenuItem class="ml-[1px]" :iconSize="23" name="Admin Dashboard" iconString="settings" pageUrl="/admin-dashboard" />
+        </RouterLink>
+
       </ul>
     </div>
 
@@ -100,24 +111,31 @@ onMounted(() => {
       </RouterLink>
       <div class="my-8"></div>
       <ul>
-        <RouterLink to="/home">
+        <!-- User -->
+        <RouterLink v-if="userRole === 'user'" to="/home">
           <MenuItem class="ml-[1px]" :iconSize="23" name="Home" iconString="home" pageUrl="/home" />
         </RouterLink>
-        
-        <RouterLink v-if="userRole === 'user' || userRole === 'admin'" to="/upload">
+
+        <RouterLink v-if="userRole === 'user'" to="/upload">
           <MenuItem class="ml-[1px]" :iconSize="23" name="Upload CV" iconString="pdf" pageUrl="/upload" />
         </RouterLink> 
+        
+
+        <!-- Company -->
+        <RouterLink v-if="userRole === 'company'" to="/company-home">
+          <MenuItem class="ml-[1px]" :iconSize="23" name="Home" iconString="home" pageUrl="/company-home" />
+        </RouterLink>
+
+        <RouterLink v-if="userRole === 'company'" to="/post-jobs">
+          <MenuItem class="ml-[1px]" :iconSize="23" name="Post Job" iconString="home" pageUrl="/post-jobs" />
+        </RouterLink>
+
+
 
         <RouterLink v-if="userRole === 'admin'" to="/admin-dashboard">
           <MenuItem class="ml-[1px]" :iconSize="23" name="Admin Dashboard" iconString="settings" pageUrl="/admin-dashboard" />
         </RouterLink>
 
-        <div class="py-3.5"></div>
-        <MenuItem class="-ml-[1px]" :iconSize="27" name="Liked" iconString="liked" pageUrl="/liked" />
-      </ul>
-      <div class="border-b border-b-gray-700"></div>
-      <ul>
-        <li class="font-semibold text-[13px] mt-3 text-gray-300 hover:text-white">ABCD</li>
       </ul>
     </div>
     

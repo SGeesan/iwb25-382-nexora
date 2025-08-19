@@ -7,7 +7,8 @@ import ForbiddenView from '../views/ForbiddenView.vue'
 import RegisterPage from '../views/RegisterPage.vue'
 import CVUpload from '../views/CVUpload.vue'
 import ProfileSection from '../views/ProfileSection.vue'
-
+import PostJob from '../views/PostJobs.vue'
+import CompanyHome from '../views/CompanyHome.vue'
 
 // Helper to decode JWT payload
 function parseJwt(token) {
@@ -62,6 +63,30 @@ const router = createRouter({
         hidePlayer: false,
         requiresAuth: true,
         allowedRoles: ['user', 'admin']
+      }
+    },
+    {
+      path: '/company-home',
+      name: 'company-home',
+      component: CompanyHome,
+      meta: {
+        hideSidebar: false,
+        hideTopNav: false,
+        hidePlayer: false,
+        requiresAuth: true,
+        allowedRoles: ['company']
+      }
+    },
+    {
+      path: '/post-jobs',
+      name: 'post-jobs',
+      component: PostJob,
+      meta: {
+        hideSidebar: false,
+        hideTopNav: false,
+        hidePlayer: false,
+        requiresAuth: true,
+        allowedRoles: ['company']
       }
     },
     {

@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import apiClient from '../utils/axios';
 import { useRouter } from 'vue-router';
+import { jwtDecode } from 'jwt-decode'
 
 // Reactive variables to store email and password
 const email = ref('');
@@ -19,15 +20,28 @@ const handleLogin = async () => {
             password: password.value,
         });
 
-        const { token, user } = response.data;
+        const { token } = response.data;
 
         // Store the JWT token
         localStorage.setItem('jwt_token', token);
 
-        // Redirect to home page after successful login
-        router.push('/home');
+        // Decode the JWT to find the user's role
+        const decodedToken = jwtDecode(token);
+        const userRole = decodedToken.role; // Assuming the role is stored in the JWT payload
 
-        console.log('Login successful!', { token, user });
+        // Redirect based on the user's role
+        if (userRole === 'user') {
+            router.push('/home');
+        } else if (userRole === 'admin') {
+            router.push('/home-admin');
+        } else if (userRole === 'company') {
+            router.push('/company-home');
+        } else {
+            // Handle unknown roles or provide a default redirect
+            router.push('/home');
+        }
+
+        console.log('Login successful!', { token });
 
     } catch (error) {
         console.error('Login failed:', error);
