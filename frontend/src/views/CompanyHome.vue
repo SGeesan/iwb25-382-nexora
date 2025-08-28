@@ -1,48 +1,29 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { TrashIcon } from '@heroicons/vue/24/outline';
+import apiClient from '../utils/axios';
 
 const jobs = ref([]);
 const isLoading = ref(true);
 const error = ref(null);
 
-// Placeholder data for demonstration
-const mockJobs = [
-  {
-    id: 1,
-    title: "Senior Full Stack Developer",
-    description: "Looking for a skilled developer to join our team...",
-    tags: ["JavaScript", "React", "Node.js", "MongoDB", "AWS"],
-    postedDate: "2024-07-25"
-  },
-  {
-    id: 2,
-    title: "UI/UX Designer",
-    description: "We need a creative designer to work on our new platform...",
-    tags: ["Figma", "UI/UX", "Tailwind CSS"],
-    postedDate: "2024-07-24"
-  },
-  {
-    id: 3,
-    title: "DevOps Engineer",
-    description: "An experienced DevOps professional to manage our infrastructure...",
-    tags: ["Go", "Kubernetes", "Docker", "CI/CD"],
-    postedDate: "2024-07-23"
-  }
-];
-
-// Function to fetch the company's job listings from a backend
 const fetchJobs = async () => {
   isLoading.value = true;
   error.value = null;
 
   try {
-    // In a real application, you would make an API call here
-    // Example: const response = await apiClient.get('/company/jobs');
-    // jobs.value = response.data;
-    
-    // Using mock data for now
-    jobs.value = mockJobs;
+    const response = await apiClient.get(`/company/get_all_jobs`);
+
+    // Map backend fields to frontend-friendly format
+    jobs.value = response.data.map(job => ({
+      id: job._id,
+      title: job.JobTitle,
+      description: job.JobDescription,
+      company: job.CompanyName,
+      tags: job.JobTags,
+      postedDate: (job.createdAt || "Not provided").split('T')[0] || "Not provided"  // fallback if no date
+    }));
+
   } catch (err) {
     error.value = "Failed to load job listings. Please try again.";
     console.error(err);
@@ -51,17 +32,29 @@ const fetchJobs = async () => {
   }
 };
 
-const deleteJob = (jobId) => {
+
+const deleteJob = async (jobId) => {
   // Confirmation dialog for the user
-  if (confirm("Are you sure you want to delete this job listing?")) {
-    // In a real application, you would make an API call here to delete the job
-    // Example: await apiClient.delete(`/company/jobs/${jobId}`);
-    
-    // For this mock data, we'll just filter the job out
-    jobs.value = jobs.value.filter(job => job.id !== jobId);
+  if (!confirm("Are you sure you want to delete this job listing?")) {
+    return;
+  }
+
+  try {
+    // Send jobId in the POST body
+    await apiClient.post(`/company/delete_job`, { jobId });
+
+    // Remove the job from the local list
+    jobs.value = jobs.value.filter(job => job._id !== jobId);
+
     alert("Job listing deleted successfully!");
+    window.location.reload();
+
+  } catch (error) {
+    console.error("Error deleting job:", error);
+    alert("Failed to delete job. Please try again.");
   }
 };
+
 
 onMounted(fetchJobs);
 </script>

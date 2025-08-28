@@ -48,3 +48,36 @@ export const getAllTags = async (req, res) => {
     }
   };
   
+
+export const getAllJobsByCreator = async (req, res) => {
+    const { username } = req.body;
+    console.log(username);
+
+    if (!username) {
+        return res.status(400).json({ message: "Username is required" });
+    }
+
+    try {
+        const jobs = await Job.find({ CompanyName: username }); 
+        res.status(200).json(jobs);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+
+export const deleteJob = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const deletedJob = await Job.findByIdAndDelete(id);
+
+        if (!deletedJob) {
+            return res.status(404).json({ message: "Job not found" });
+        }
+
+        res.status(200).json({ message: "Job deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};

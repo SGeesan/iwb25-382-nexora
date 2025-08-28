@@ -11,6 +11,7 @@
     "@heroicons/vue": "^2.1.1",
     "axios": "^1.10.0",
     "jwt-decode": "^4.0.0",
+    "lucide-vue-next": "^0.542.0",
     "pinia": "^2.0.28",
     "pinia-plugin-persistedstate": "^3.0.2",
     "uniqolor": "^1.1.0",

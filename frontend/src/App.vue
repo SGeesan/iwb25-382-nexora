@@ -78,7 +78,7 @@ onMounted(() => {
         
 
         <RouterLink v-if="userRole === 'user'" to="/jobs">
-          <MenuItem class="ml-[1px]" :iconSize="23" name="Search jobs" iconString="pdf" pageUrl="/jobs" />
+          <MenuItem class="ml-[1px]" :iconSize="23" name="Search jobs" iconString="sh" pageUrl="/jobs" />
         </RouterLink>       
 
 
@@ -122,7 +122,7 @@ onMounted(() => {
         </RouterLink>
 
         <RouterLink v-if="userRole === 'user'" to="/jobs">
-          <MenuItem class="ml-[1px]" :iconSize="23" name="Search jobs" iconString="pdf" pageUrl="/jobs" />
+          <MenuItem class="ml-[1px]" :iconSize="23" name="Search jobs" iconString="sh" pageUrl="/jobs" />
         </RouterLink>         
 
         <!-- Company -->
@@ -131,7 +131,7 @@ onMounted(() => {
         </RouterLink>
 
         <RouterLink v-if="userRole === 'company'" to="/post-jobs">
-          <MenuItem class="ml-[1px]" :iconSize="23" name="Post Job" iconString="home" pageUrl="/post-jobs" />
+          <MenuItem class="ml-[1px]" :iconSize="23" name="Post Job" iconString="add" pageUrl="/post-jobs" />
         </RouterLink>
 
 

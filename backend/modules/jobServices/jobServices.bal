@@ -29,22 +29,30 @@ public isolated function getJobsByTags(string[] tags) returns Job[]|error {
 }
 
 public isolated function getAllJobsByCreator(string username) returns Job[]|error {
-    Job[] jobs = [
-        {
-            "_id": "J001",
-            "JobTitle": "Backend Developer",
-            "JobDescription": "Build and maintain server-side applications, ensuring high performance and responsiveness.",
-            "CompanyName": "CodeSphere Technologies",
-            "JobTags": ["Node.js", "Express", "MongoDB", "API Development"]
-        },
-        {
-            "_id": "J002",
-            "JobTitle": "Machine Learning Engineer",
-            "JobDescription": "Design, train, and deploy machine learning models for real-world applications.",
-            "CompanyName": "DataVision Labs",
-            "JobTags": ["Python", "TensorFlow", "Data Science", "Model Deployment"]
-        }
-    ];
-    // Logic to retrieve all job creators
+    if username == "" {
+        return error("Username is required");
+    }
+
+    // Initialize the client
+    http:Client mongoClient = check new http:Client(USER_HANDLER_SERVICE_URL);
+
+    // Prepare payload to send to the backend
+    json payload = { "username": username };
+
+    // Call the backend endpoint to fetch jobs by creator
+    Job[] jobs = check mongoClient->/jobs/getAllJobsByCreator.post(payload);
+
     return jobs;
+}
+
+public isolated function deleteJob(string jobId) returns http:Response|error {
+    if jobId == "" {
+        return error("Job ID is required");
+    }
+
+    http:Client mongoClient = check new http:Client(USER_HANDLER_SERVICE_URL);
+
+    // Note: 'id' must match Node.js route param
+    http:Response response = check mongoClient->/jobs/deleteJob/[jobId].delete();
+    return response;
 }

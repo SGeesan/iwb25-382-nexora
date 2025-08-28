@@ -133,6 +133,19 @@ service / on mainListner {
     @http:ResourceConfig {
         auth: [{jwtValidatorConfig: validatorConfig, scopes: ["company"]}]
     }
+    isolated resource function post company/delete_job(@http:Header string Authorization, @http:Payload json payload) returns http:Response|error {
+        string username = check util:get_username_from_BearerToken(Authorization);
+        
+        // Extract jobId from the payload
+        string jobId = check payload.jobId;
+        
+        return jobs:deleteJob(jobId);
+    }
+
+
+    @http:ResourceConfig {
+        auth: [{jwtValidatorConfig: validatorConfig, scopes: ["company"]}]
+    }
     isolated resource function get company/get_all_jobs(@http:Header string Authorization) returns jobs:Job[]|error {
         // This endpoint allows users to get all job tags
         string username = check util:get_username_from_BearerToken(Authorization); // Validate JWT and get username

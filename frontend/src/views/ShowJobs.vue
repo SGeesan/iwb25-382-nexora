@@ -1,25 +1,54 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import apiClient from '../utils/axios';
+import { jwtDecode } from 'jwt-decode';
 
-// Reactive variables to manage component state
 const jobs = ref([]);
 const isLoading = ref(false);
 const error = ref(null);
 
-// Function to fetch job listings from the backend
+// ✅ Decode JWT to get username
+let username = null;
+const token = localStorage.getItem('jwt_token');
+if (token) {
+  try {
+    const decoded = jwtDecode(token);
+    username = decoded.user_name; // direct from JWT
+  } catch (e) {
+    console.error("Invalid JWT:", e);
+  }
+}
+
+// Save jobs with username key
+const saveJobsToLocal = (data) => {
+  if (username) {
+    localStorage.setItem(`jobs_${username}`, JSON.stringify(data));
+  }
+};
+
+// Load jobs from localStorage
+const loadJobsFromLocal = () => {
+  if (username) {
+    const stored = localStorage.getItem(`jobs_${username}`);
+    if (stored) {
+      try {
+        jobs.value = JSON.parse(stored);
+      } catch (e) {
+        console.error("Failed to parse stored jobs", e);
+      }
+    }
+  }
+};
+
+// API call
 const fetchJobs = async () => {
   isLoading.value = true;
   error.value = null;
-  jobs.value = []; // Clear previous results
+  jobs.value = [];
 
   try {
-    // Make the API call to the specified endpoint
     const response = await apiClient.get('/user/search_jobs');
-    
-    // The response data is an array of job objects
-    // Map the incoming data to match the component's expected structure
-    jobs.value = response.data.map(job => ({
+    const fetchedJobs = response.data.map(job => ({
       id: job._id,
       title: job.JobTitle,
       company: job.CompanyName,
@@ -27,16 +56,23 @@ const fetchJobs = async () => {
       tags: job.JobTags,
       postedDate: new Date(job.createdAt).toLocaleDateString()
     }));
+
+    jobs.value = fetchedJobs;
+    saveJobsToLocal(fetchedJobs); // overwrite cache
   } catch (err) {
-    // Handle API call errors
     error.value = "Failed to load job listings. Please try again.";
     console.error(err);
   } finally {
-    // Set loading state to false once data is fetched or an error occurs
     isLoading.value = false;
   }
 };
+
+// On mount, load cache if available
+onMounted(() => {
+  loadJobsFromLocal();
+});
 </script>
+
 
 <template>
   <div class="p-8 text-white min-h-screen">
