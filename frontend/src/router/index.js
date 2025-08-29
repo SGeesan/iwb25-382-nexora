@@ -10,6 +10,8 @@ import ProfileSection from '../views/ProfileSection.vue'
 import PostJob from '../views/PostJobs.vue'
 import CompanyHome from '../views/CompanyHome.vue'
 import SearchJobs from '../views/ShowJobs.vue'
+import DocUpload from '../views/DocUpload.vue'
+import AdminHome from '../views/AdminHome.vue'
 
 // Helper to decode JWT payload
 function parseJwt(token) {
@@ -100,6 +102,30 @@ const router = createRouter({
         hidePlayer: false,
         requiresAuth: true,
         allowedRoles: ['company']
+      }
+    },
+    {
+      path: '/upload-docs',
+      name: 'DocUpload',
+      component: DocUpload,
+      meta: {
+        hideSidebar: false,
+        hideTopNav: false,
+        hidePlayer: false,
+        requiresAuth: true,
+        allowedRoles: ['company']
+      }
+    },
+    {
+      path: '/admin-dashboard',
+      name: 'admin-dashboard',
+      component: AdminHome,
+      meta: {
+        hideSidebar: false,
+        hideTopNav: false,
+        hidePlayer: false,
+        requiresAuth: true,
+        allowedRoles: ['admin']
       }
     },
     {

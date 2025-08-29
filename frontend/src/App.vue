@@ -91,6 +91,9 @@ onMounted(() => {
           <MenuItem class="ml-[1px]" :iconSize="23" name="Post Job" iconString="home" pageUrl="/post-jobs" />
         </RouterLink>
 
+        <RouterLink v-if="userRole === 'company'" to="/upload-docs">
+          <MenuItem class="ml-[1px]" :iconSize="23" name="Company Verification" iconString="pdf" pageUrl="/upload-docs" />
+        </RouterLink>
 
 
         <RouterLink v-if="userRole === 'user'" to="/upload">
@@ -98,11 +101,7 @@ onMounted(() => {
         </RouterLink> 
 
         <RouterLink v-if="userRole === 'admin'" to="/admin-dashboard">
-          <MenuItem class="ml-[1px]" :iconSize="23" name="Admin Dashboard" iconString="settings" pageUrl="/admin-dashboard" />
-        </RouterLink>
-
-        <RouterLink v-if="userRole === 'admin'" to="/admin-dashboard">
-          <MenuItem class="ml-[1px]" :iconSize="23" name="Admin Dashboard" iconString="settings" pageUrl="/admin-dashboard" />
+          <MenuItem class="ml-[1px]" :iconSize="23" name="Admin Dashboard" iconString="home" pageUrl="/admin-dashboard" />
         </RouterLink>
 
       </ul>
@@ -134,10 +133,14 @@ onMounted(() => {
           <MenuItem class="ml-[1px]" :iconSize="23" name="Post Job" iconString="add" pageUrl="/post-jobs" />
         </RouterLink>
 
+        <RouterLink v-if="userRole === 'company'" to="/upload-docs">
+          <MenuItem class="ml-[1px]" :iconSize="23" name="Company Verification" iconString="pdf" pageUrl="/upload-docs" />
+        </RouterLink>
+
 
 
         <RouterLink v-if="userRole === 'admin'" to="/admin-dashboard">
-          <MenuItem class="ml-[1px]" :iconSize="23" name="Admin Dashboard" iconString="settings" pageUrl="/admin-dashboard" />
+          <MenuItem class="ml-[1px]" :iconSize="23" name="Admin Dashboard" iconString="home" pageUrl="/admin-dashboard" />
         </RouterLink>
 
       </ul>

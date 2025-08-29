@@ -54,15 +54,32 @@ const changePassword = async () => {
     isLoading.value = false;
   }
 };
+
+const goBack = () => {
+    router.go(-1);
+};
+
 </script>
 
 <template>
   <div class="p-8 text-white">
     <!-- Back Button -->
     <div class="absolute top-0 left-0 p-8">
-        <button @click="router.back()" class="flex items-center text-gray-400 hover:text-white transition-colors duration-200">
-            <ArrowLeft :size="24" class="mr-1" />
-            <span class="font-semibold">Back</span>
+        <button
+          @click="goBack"
+          class="absolute top-4 left-4 text-white hover:text-[#808080] transition-colors"
+          aria-label="Go back"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
         </button>
     </div>
     

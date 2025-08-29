@@ -33,7 +33,7 @@ const handleLogin = async () => {
         if (userRole === 'user') {
             router.push('/home');
         } else if (userRole === 'admin') {
-            router.push('/home-admin');
+            router.push('/admin-dashboard');
         } else if (userRole === 'company') {
             router.push('/company-home');
         } else {
