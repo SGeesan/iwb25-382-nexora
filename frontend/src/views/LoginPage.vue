@@ -8,7 +8,7 @@ import { jwtDecode } from 'jwt-decode'
 const email = ref('');
 const password = ref('');
 const errorMessage = ref(''); // To display any login errors
-
+const isLoading = ref(false);
 const router = useRouter(); // Initialize router if you're using it
 
 const handleLogin = async () => {

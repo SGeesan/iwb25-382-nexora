@@ -49,6 +49,7 @@
 
 <script setup>
 import { ref } from 'vue';
+import apiClient from '../utils/axios'; // ✅ axios wrapper
 
 const selectedFile = ref(null);
 const fileName = ref('');
@@ -58,7 +59,7 @@ const messageClass = ref('');
 const handleFileChange = (event) => {
   const file = event.target.files[0];
   if (file) {
-    if (file.size > 10485760) { // 10MB limit
+    if (file.size > 10485760) { // 10MB
       selectedFile.value = null;
       fileName.value = '';
       message.value = 'File is too large. Max size is 10MB.';
@@ -74,30 +75,32 @@ const handleFileChange = (event) => {
   }
 };
 
-const uploadDocument = () => {
+const uploadDocument = async () => {
   if (!selectedFile.value) {
     message.value = 'Please select a file to upload.';
     messageClass.value = 'bg-red-500 text-white';
     return;
   }
-  
+
   message.value = 'Uploading document...';
   messageClass.value = 'bg-yellow-500 text-white';
-  
-  // Here, you would implement the actual logic to send the file to your server.
-  // This is a placeholder for that logic.
-  // You would typically use an API call with a library like 'axios' or the native 'fetch' API.
-  console.log('File to upload:', selectedFile.value);
-  
-  setTimeout(() => {
-    message.value = 'Document uploaded successfully! It is now pending verification.';
+
+  try {
+    const response = await apiClient.post('/company/upload_request', selectedFile.value,
+      {}
+    );
+
+    message.value = 'Document uploaded successfully! Pending verification.';
     messageClass.value = 'bg-green-500 text-white';
-    // Clear the form after a successful upload
     selectedFile.value = null;
     fileName.value = '';
-  }, 2000); // Simulate an API call
+  } catch (err) {
+    message.value = `Upload failed: ${err.response?.data || err.message}`;
+    messageClass.value = 'bg-red-500 text-white';
+  }
 };
 </script>
+
 
 <style scoped>
 /* No specific custom styles needed for this component, Tailwind handles it */

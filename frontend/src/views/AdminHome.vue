@@ -100,6 +100,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import apiClient from '../utils/axios';
 
 const requests = ref([]);
 const isViewerOpen = ref(false);
@@ -107,72 +108,79 @@ const selectedPages = ref([]);
 const currentPageIndex = ref(0);
 const companyName = ref('');
 
-// Mock data now includes an array of document page URLs
-const mockRequests = [
-  { 
-    id: 1, 
-    companyName: 'Innovate Solutions Inc.', 
-    submissionDate: '2025-08-25', 
-    status: 'Pending', 
-    documentPages: [
-      'https://placehold.co/800x1100/1a1a1a/FFFFFF?text=Page+1',
-      'https://placehold.co/800x1100/1a1a1a/FFFFFF?text=Page+2',
-      'https://placehold.co/800x1100/1a1a1a/FFFFFF?text=Page+3'
-    ]
-  },
-  { 
-    id: 2, 
-    companyName: 'Global Tech Corp', 
-    submissionDate: '2025-08-24', 
-    status: 'Pending', 
-    documentPages: [
-      'https://placehold.co/800x1100/1a1a1a/FFFFFF?text=Page+1',
-      'https://placehold.co/800x1100/1a1a1a/FFFFFF?text=Page+2'
-    ]
-  },
-  { 
-    id: 3, 
-    companyName: 'Creative Ventures LLC', 
-    submissionDate: '2025-08-22', 
-    status: 'Verified', 
-    documentPages: [
-      'https://placehold.co/800x1100/1a1a1a/FFFFFF?text=Page+1'
-    ]
-  },
-  { 
-    id: 4, 
-    companyName: 'Blue Sky Innovations', 
-    submissionDate: '2025-08-20', 
-    status: 'Rejected', 
-    documentPages: [] 
-  },
-];
+// ✅ Fetch requests
+const fetchRequests = async () => {
+  try {
+    const { data } = await apiClient.get('/admin/get_all_company_requests');
 
-const fetchRequests = () => {
-  requests.value = mockRequests;
-};
-
-const approveRequest = (id) => {
-  const request = requests.value.find(req => req.id === id);
-  if (request) {
-    request.status = 'Verified';
-    console.log(`Request ${id} has been approved.`);
+    requests.value = data.map(item => ({
+      id: item._id,
+      companyName: item.company_name,
+      submissionDate: new Date(item.createdAt).toLocaleDateString(),
+      status: item.status.charAt(0).toUpperCase() + item.status.slice(1), // normalize
+      documentPages: item.file_uuid ? [`/uploads/${item.file_uuid}.png`] : []
+    }));
+  } catch (error) {
+    console.error("Error fetching company requests:", error);
   }
 };
 
-const rejectRequest = (id) => {
-  const request = requests.value.find(req => req.id === id);
-  if (request) {
-    request.status = 'Rejected';
-    console.log(`Request ${id} has been rejected.`);
+// ✅ Unified update function
+const updateRequestStatus = async (id, newStatus) => {
+  try {
+    await apiClient.put(`/admin/update_company_request_status/${id}`, {
+      new_status: newStatus.toLowerCase()  // backend expects lowercase
+    });
+
+    const request = requests.value.find(req => req.id === id);
+    if (request) {
+      request.status = newStatus;
+    }
+  } catch (error) {
+    console.error(`Error updating request ${id} to ${newStatus}:`, error);
   }
 };
 
-const showDocumentViewer = (pages, name) => {
-  selectedPages.value = pages;
-  companyName.value = name;
+// ✅ Simple wrappers
+const approveRequest = (id) => updateRequestStatus(id, 'Approved');
+const rejectRequest = (id) => updateRequestStatus(id, 'Rejected');
+
+const showDocumentViewer = async (fileUuid, company) => {
+  selectedPages.value = [];
   currentPageIndex.value = 0;
-  isViewerOpen.value = true;
+  companyName.value = company;
+
+  try {
+    // Step 1: Get document info
+    const { data } = await apiClient.get(`/admin/get_company_request_doc/${companyName.value}`);
+    const { uuid, page_count, images } = data; // images is optional if you want paths
+
+    // Step 2: Fetch each page as a blob concurrently
+    const fetchedImages = await Promise.all(
+      images.map(async (imgPath) => {
+        // Extract page number
+        const pageNum = imgPath.split('/').pop();
+        const pathParam = encodeURIComponent(`${uuid}/${pageNum}`);
+
+        const imageResponse = await apiClient.get(`/admin/get_cr_image?path=/image/${pathParam}`, {
+          responseType: 'arraybuffer',
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('jwt_token')}`
+          }
+        });
+
+        const blob = new Blob([imageResponse.data], { type: imageResponse.headers['content-type'] });
+        return URL.createObjectURL(blob);
+      })
+    );
+
+    selectedPages.value = fetchedImages;
+    isViewerOpen.value = true;
+
+  } catch (err) {
+    console.error("Error fetching document pages", err);
+    alert("Failed to load document pages.");
+  }
 };
 
 const closeViewer = () => {
@@ -183,21 +191,19 @@ const closeViewer = () => {
 };
 
 const prevPage = () => {
-  if (currentPageIndex.value > 0) {
-    currentPageIndex.value--;
-  }
+  if (currentPageIndex.value > 0) currentPageIndex.value--;
 };
 
 const nextPage = () => {
-  if (currentPageIndex.value < selectedPages.value.length - 1) {
-    currentPageIndex.value++;
-  }
+  if (currentPageIndex.value < selectedPages.value.length - 1) currentPageIndex.value++;
 };
 
 onMounted(() => {
   fetchRequests();
 });
 </script>
+
+
 
 <style scoped>
 /* Tailwind CSS handles all styling */

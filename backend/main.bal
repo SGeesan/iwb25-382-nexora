@@ -33,7 +33,7 @@ http:JwtValidatorConfig validatorConfig = {
         allowCredentials: true,
         allowHeaders: ["Content-Type", "Authorization"],
         exposeHeaders: ["Content-Type", "Authorization"],
-        allowMethods: ["GET", "POST", "OPTIONS"]
+        allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
     }
 }
 service / on mainListner {
@@ -186,7 +186,7 @@ service / on mainListner {
         return auth:getAllCompanyRequests();
     }
 
-    isolated resource function get admin/get_company_request_doc(string company_name) returns file:ImageInfo|error{
+    isolated resource function get admin/get_company_request_doc/[string company_name]() returns file:ImageInfo|error{
         return file:getdocInfo(company_name);
     }
 

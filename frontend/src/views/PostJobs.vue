@@ -10,6 +10,28 @@ const availableTags = ref([]);
 const searchTerm = ref("");
 const showTagsDropdown = ref(false);
 const postStatus = ref(null); // 'success', 'error' or null
+const companyApproved = ref(false);
+const loading = ref(true);
+
+const checkCompanyStatus = async () => {
+  try {
+    const token = localStorage.getItem("token"); // or wherever you store JWT
+    const response = await apiClient.get('/company/get_cr_status', {
+    });
+    // Only approve if status is "approved"
+    if (response.data && response.data.status === "approved") {
+      companyApproved.value = true;
+    } else {
+      companyApproved.value = false;
+    }
+  } catch (error) {
+    console.error('Company status check failed:', error);
+    companyApproved.value = false;
+  } finally {
+    loading.value = false;
+  }
+};
+
 
 // Function to fetch the available tags from the backend
 const fetchTags = async () => {
@@ -75,7 +97,11 @@ const handleSubmit = async () => {
 };
 
 // Fetch tags when the component is first loaded
-onMounted(fetchTags);
+onMounted(() => {
+  checkCompanyStatus();
+  fetchTags();
+});
+
 </script>
 
 <template>
@@ -87,7 +113,11 @@ onMounted(fetchTags);
         </span>
       </h1>
       
-      <form @submit.prevent="handleSubmit" class="space-y-6">
+      <div v-if="loading" class="text-center text-gray-400">
+        <p>Checking company approval status...</p>
+        </div>
+      
+      <form @submit.prevent="handleSubmit" class="space-y-6" v-else-if="companyApproved">
         <div>
           <label for="jobTitle" class="block text-gray-300 font-semibold mb-2">Job Title</label>
           <input
@@ -115,7 +145,6 @@ onMounted(fetchTags);
         <div>
           <label for="tags" class="block text-gray-300 font-semibold mb-2">Required Skills / Tags</label>
           
-          <!-- Selected Tags Display -->
           <div v-if="selectedTags.length" class="flex flex-wrap gap-2 mb-4">
             <span
               v-for="tag in selectedTags"
@@ -133,7 +162,6 @@ onMounted(fetchTags);
             </span>
           </div>
 
-          <!-- Tags Search Input and Dropdown -->
           <div class="relative">
             <input
               id="tags"
@@ -164,13 +192,11 @@ onMounted(fetchTags);
           </div>
         </div>
 
-        <!-- Submission Status Message -->
         <div v-if="postStatus" :class="{'text-green-400': postStatus === 'success', 'text-red-400': postStatus === 'error'}" class="text-center font-medium mt-4">
-          <p v-if="postStatus === 'success'">Job post submitted successfully!</p>
-          <p v-if="postStatus === 'error'">Failed to submit job post. Please try again.</p>
+          <p v-if="postStatus === 'success'">Job post submitted successfully! ✅</p>
+          <p v-if="postStatus === 'error'">Failed to submit job post. Please try again. ❌</p>
         </div>
 
-        <!-- Submit Button -->
         <div class="pt-4">
           <button
             type="submit"
@@ -180,6 +206,18 @@ onMounted(fetchTags);
           </button>
         </div>
       </form>
+      
+      <div v-else class="text-center py-12">
+        <div class="text-red-400 text-6xl mb-4">
+          <span role="img" aria-label="warning sign">⚠️</span>
+        </div>
+        <h2 class="text-3xl font-bold text-gray-200 mb-2">Company Not Approved</h2>
+        <p class="text-gray-400 text-lg max-w-md mx-auto">
+          You cannot post new jobs until your company registration is approved by the administration.
+          <br>Please contact support if you believe this is an error.
+        </p>
+      </div>
+      
     </div>
   </div>
 </template>
