@@ -1,15 +1,15 @@
 <template>
-  <div class="p-8">
+  <div class="p-8 bg-[#101010] min-h-screen">
     <h1 class="text-3xl font-semibold text-white mb-6">Admin Dashboard</h1>
     <p class="text-gray-400 mb-8">Review and manage company verification requests.</p>
 
-    <div v-if="requests.length === 0" class="bg-[#101010] p-6 rounded-lg text-center text-gray-500">
+    <div v-if="requests.length === 0" class="bg-[#1a1a1a] p-6 rounded-lg text-center text-gray-500">
       <p class="text-lg">No pending verification requests at this time.</p>
     </div>
 
-    <div v-else class="bg-[#101010] p-6 rounded-lg shadow-lg overflow-x-auto">
+    <div v-else class="bg-[#1a1a1a] p-6 rounded-lg shadow-lg overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-700">
-        <thead class="bg-[#1a1a1a]">
+        <thead class="bg-[#282828]">
           <tr>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Company Name</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Submission Date</th>
@@ -18,7 +18,7 @@
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-700">
-          <tr v-for="request in requests" :key="request.id" class="transition-all duration-300 hover:bg-[#282828]">
+          <tr v-for="request in requests" :key="request.id" class="transition-all duration-300 hover:bg-[#333333]">
             <td class="px-6 py-4 whitespace-nowrap text-white">{{ request.companyName }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-gray-400">{{ request.submissionDate }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-gray-400">
@@ -51,14 +51,49 @@
                 >
                   Reject
                 </button>
-                <a :href="request.documentUrl" target="_blank" class="text-blue-400 hover:text-blue-500 transition-colors duration-200">
+                <button @click="showDocumentViewer(request.documentPages, request.companyName)" class="text-blue-400 hover:text-blue-500 transition-colors duration-200">
                   View Document
-                </a>
+                </button>
               </div>
             </td>
           </tr>
         </tbody>
       </table>
+    </div>
+    
+    <div v-if="isViewerOpen" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+      <div class="bg-[#1a1a1a] p-6 rounded-lg w-11/12 md:w-3/4 lg:w-1/2 max-h-[90vh] overflow-y-auto relative">
+        <button @click="closeViewer" class="absolute top-4 right-4 text-gray-400 hover:text-gray-200">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        <h2 class="text-2xl text-white font-bold mb-4">{{ companyName.toUpperCase() }}</h2>
+        
+        <div v-if="selectedPages.length > 1" class="flex justify-center items-center mb-4 text-white">
+          <button @click="prevPage" :disabled="currentPageIndex === 0" class="p-2 disabled:opacity-50">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <span class="mx-4">Page {{ currentPageIndex + 1 }} of {{ selectedPages.length }}</span>
+          <button @click="nextPage" :disabled="currentPageIndex === selectedPages.length - 1" class="p-2 disabled:opacity-50">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="flex justify-center">
+          <img 
+            v-if="selectedPages.length > 0"
+            :src="selectedPages[currentPageIndex]" 
+            :alt="'Document Page ' + (currentPageIndex + 1)" 
+            class="w-full h-auto rounded-lg shadow-lg max-w-full"
+          >
+          <p v-else class="text-gray-400">No document pages found.</p>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -67,17 +102,53 @@
 import { ref, onMounted } from 'vue';
 
 const requests = ref([]);
+const isViewerOpen = ref(false);
+const selectedPages = ref([]);
+const currentPageIndex = ref(0);
+const companyName = ref('');
 
-// This function simulates fetching requests from a database.
-// In a real application, you would make an API call here.
+// Mock data now includes an array of document page URLs
+const mockRequests = [
+  { 
+    id: 1, 
+    companyName: 'Innovate Solutions Inc.', 
+    submissionDate: '2025-08-25', 
+    status: 'Pending', 
+    documentPages: [
+      'https://placehold.co/800x1100/1a1a1a/FFFFFF?text=Page+1',
+      'https://placehold.co/800x1100/1a1a1a/FFFFFF?text=Page+2',
+      'https://placehold.co/800x1100/1a1a1a/FFFFFF?text=Page+3'
+    ]
+  },
+  { 
+    id: 2, 
+    companyName: 'Global Tech Corp', 
+    submissionDate: '2025-08-24', 
+    status: 'Pending', 
+    documentPages: [
+      'https://placehold.co/800x1100/1a1a1a/FFFFFF?text=Page+1',
+      'https://placehold.co/800x1100/1a1a1a/FFFFFF?text=Page+2'
+    ]
+  },
+  { 
+    id: 3, 
+    companyName: 'Creative Ventures LLC', 
+    submissionDate: '2025-08-22', 
+    status: 'Verified', 
+    documentPages: [
+      'https://placehold.co/800x1100/1a1a1a/FFFFFF?text=Page+1'
+    ]
+  },
+  { 
+    id: 4, 
+    companyName: 'Blue Sky Innovations', 
+    submissionDate: '2025-08-20', 
+    status: 'Rejected', 
+    documentPages: [] 
+  },
+];
+
 const fetchRequests = () => {
-  // Mock data for demonstration purposes
-  const mockRequests = [
-    { id: 1, companyName: 'Innovate Solutions Inc.', submissionDate: '2025-08-25', status: 'Pending', documentUrl: 'https://placehold.co/600x400/000000/FFFFFF?text=Document' },
-    { id: 2, companyName: 'Global Tech Corp', submissionDate: '2025-08-24', status: 'Pending', documentUrl: 'https://placehold.co/600x400/000000/FFFFFF?text=Document' },
-    { id: 3, companyName: 'Creative Ventures LLC', submissionDate: '2025-08-22', status: 'Verified', documentUrl: 'https://placehold.co/600x400/000000/FFFFFF?text=Document' },
-    { id: 4, companyName: 'Blue Sky Innovations', submissionDate: '2025-08-20', status: 'Rejected', documentUrl: 'https://placehold.co/600x400/000000/FFFFFF?text=Document' },
-  ];
   requests.value = mockRequests;
 };
 
@@ -86,7 +157,6 @@ const approveRequest = (id) => {
   if (request) {
     request.status = 'Verified';
     console.log(`Request ${id} has been approved.`);
-    // Here you would make an API call to update the status on the server.
   }
 };
 
@@ -95,7 +165,32 @@ const rejectRequest = (id) => {
   if (request) {
     request.status = 'Rejected';
     console.log(`Request ${id} has been rejected.`);
-    // Here you would make an API call to update the status on the server.
+  }
+};
+
+const showDocumentViewer = (pages, name) => {
+  selectedPages.value = pages;
+  companyName.value = name;
+  currentPageIndex.value = 0;
+  isViewerOpen.value = true;
+};
+
+const closeViewer = () => {
+  isViewerOpen.value = false;
+  selectedPages.value = [];
+  currentPageIndex.value = 0;
+  companyName.value = '';
+};
+
+const prevPage = () => {
+  if (currentPageIndex.value > 0) {
+    currentPageIndex.value--;
+  }
+};
+
+const nextPage = () => {
+  if (currentPageIndex.value < selectedPages.value.length - 1) {
+    currentPageIndex.value++;
   }
 };
 

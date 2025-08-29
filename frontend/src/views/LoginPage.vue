@@ -45,11 +45,27 @@ const handleLogin = async () => {
 
     } catch (error) {
         console.error('Login failed:', error);
-        if (error.response && error.response.data && error.response.data.message) {
-            errorMessage.value = error.response.data.message;
+        if (error.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            if (error.response.status === 401 || error.response.status === 400) {
+                // Handle specific authentication errors
+                errorMessage.value = 'Invalid email or password. Please try again.';
+            } else if (error.response.data && error.response.data) {
+                // Fallback to a message provided by the API
+                errorMessage.value = error.response.data;
+            } else {
+                errorMessage.value = 'An error occurred during login. Please try again.';
+            }
+        } else if (error.request) {
+            // The request was made but no response was received
+            errorMessage.value = 'No response from server. Please check your network connection.';
         } else {
+            // Something happened in setting up the request that triggered an Error
             errorMessage.value = 'An unexpected error occurred. Please try again.';
         }
+    } finally {
+        isLoading.value = false;
     }
 };
 </script>
