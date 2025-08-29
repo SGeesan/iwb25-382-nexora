@@ -134,7 +134,7 @@ service / on mainListner {
         auth: [{jwtValidatorConfig: validatorConfig, scopes: ["company"]}]
     }
     isolated resource function post company/delete_job(@http:Header string Authorization, @http:Payload json payload) returns http:Response|error {
-        string username = check util:get_username_from_BearerToken(Authorization);
+        // string username = check util:get_username_from_BearerToken(Authorization);
         
         // Extract jobId from the payload
         string jobId = check payload.jobId;
