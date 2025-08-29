@@ -66,7 +66,7 @@ service / on mainListner {
         // This endpoint allows users to upload their CVs
         string username = check util:get_username_from_BearerToken(Authorization); // Validate JWT and get username
         byte[] bytes = check request.getBinaryPayload();
-        return file:uploadFile(bytes, username);
+        return file:uploadCV(bytes, username);
     }
 
     @http:ResourceConfig {
@@ -85,7 +85,7 @@ service / on mainListner {
         //@http:Header string Authorization
         //string username = check util:get_username_from_BearerToken(Authorization);
         // Add a security check here to ensure the user has access to this CV image
-        return file:getCVImage(path);
+        return file:getImage(path);
     }
 
 
@@ -96,7 +96,7 @@ service / on mainListner {
         io:print("Searching jobs for user: ", username, "\n");
 
         // PDF -> images
-        io:ReadableByteChannel[] images = check file:getCVasImages(username);
+        io:ReadableByteChannel[] images = check file:getPDFasImages(username);
         if images.length() == 0 {
             http:NotFound notFoundResponse = {body: "No CVs found for the user"};
             return notFoundResponse;
@@ -121,6 +121,18 @@ service / on mainListner {
     }
 
     // ==== Company endpoints ====
+    isolated resource function post company/upload_request(@http:Header string Authorization, http:Request request) returns http:Response|error {
+        // This endpoint allows users to upload their CVs
+        string company_name = check util:get_username_from_BearerToken(Authorization); // Validate JWT and get username
+        byte[] bytes = check request.getBinaryPayload();
+        return file:uploadReqDoc(bytes, company_name);
+    }
+
+    isolated resource function get company/get_cr_status(@http:Header string Authorization) returns auth:CompanyRequest|error {
+        // This endpoint allows users to get their CV UUID
+        string company_name = check util:get_username_from_BearerToken(Authorization); // Validate JWT and get username
+        return auth:getCompanyRequest(company_name);
+    }
     @http:ResourceConfig {
         auth: [{jwtValidatorConfig: validatorConfig, scopes: ["company"]}]
     }
@@ -129,6 +141,7 @@ service / on mainListner {
         string username = check util:get_username_from_BearerToken(Authorization); // Validate JWT and get username
         return jobs:createJob(newJob, username);
     }
+    
 
     @http:ResourceConfig {
         auth: [{jwtValidatorConfig: validatorConfig, scopes: ["company"]}]
@@ -167,5 +180,26 @@ service / on mainListner {
     isolated resource function get hello(@http:Header string Authorization) returns string|error {
         string username = check util:get_username_from_BearerToken(Authorization);
         return "Hi " + username + ", this is a secured endpoint only for admins!";
+    }
+
+    isolated resource function get admin/get_all_company_requests() returns auth:CompanyRequest[]|error {
+        return auth:getAllCompanyRequests();
+    }
+
+    isolated resource function get admin/get_company_request_doc(string company_name) returns file:ImageInfo|error{
+        return file:getdocInfo(company_name);
+    }
+
+    isolated resource function get admin/get_cr_image(string path) returns http:Response|error {
+        //@http:Header string Authorization
+        //string username = check util:get_username_from_BearerToken(Authorization);
+        // Add a security check here to ensure the user has access to this CV image
+        return file:getImage(path);
+    }
+
+    isolated resource function put admin/update_company_request_status/[string _id](map<json> payload) returns http:Response|error {
+    json status = check payload.new_status;
+    string new_status = status.toString();
+    return auth:updateCompanyRequestStatus(_id,new_status);
     }
 }
