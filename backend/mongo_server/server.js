@@ -4,6 +4,7 @@ import connectDB from "./config/db.js";
 import userRoutes from "./routes/userRoutes.js";
 import jobRoutes from "./routes/jobRoutes.js";
 import cvRoutes from "./routes/cvRoutes.js";
+import crRoutes from "./routes/crRoutes.js";
 import cors from "cors";
 import morgan from "morgan";
 
@@ -17,6 +18,7 @@ app.use(morgan("dev"));
 app.use("/api/user", userRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/cv", cvRoutes);
+app.use("/api/cr", crRoutes);
 
 const startServer = async () => {
   try {

@@ -6,12 +6,7 @@ import BalService.util;
 configurable string USER_HANDLER_SERVICE_URL = "http://localhost:5000/api";
 configurable string FILE_HANDLER_SERVICE_URL = "http://localhost:8000";
 
-public type ImageInfo record {
-    int page_count;
-    string[] images;
-};
-
-public isolated function uploadFile(byte[] file, string username) returns http:Response|error {
+public isolated function uploadCV(byte[] file, string username) returns http:Response|error {
     // This function is a placeholder for the file upload logic
     // It should handle the file upload process, save the file, and return an appropriate response
     http:Client fileClient = check new (FILE_HANDLER_SERVICE_URL,httpVersion = "1.1");
@@ -33,7 +28,29 @@ public isolated function uploadFile(byte[] file, string username) returns http:R
     return response;
 }
 
-public isolated function getCVasImages(string username) returns io:ReadableByteChannel[]|error {
+public isolated function uploadReqDoc(byte[] file, string company_name) returns http:Response|error {
+    // This function is a placeholder for the file upload logic
+    // It should handle the file upload process, save the file, and return an appropriate response
+    http:Client fileClient = check new (FILE_HANDLER_SERVICE_URL,httpVersion = "1.1");
+    
+    // Creat Multipart request with PDF file
+    mime:Entity pdfBodyPart = check util:newPDFEntity(file,"pdf","doc.pdf");
+    mime:Entity[] parts= [pdfBodyPart];
+    http:Request request = new;
+    request.setBodyParts(parts);
+
+    json uuidJson = check fileClient->/upload.post(request);
+    string uuid = check uuidJson.uuid; 
+    http:Client mongoClient = check new (USER_HANDLER_SERVICE_URL);
+    json fileData = {
+        "company_name": company_name,
+        "file_uuid": uuid
+    };
+    http:Response response = check mongoClient->/cr/addCompanyRequest.post(fileData);
+    return response;
+}
+
+public isolated function getPDFasImages(string username) returns io:ReadableByteChannel[]|error {
     // This function is a placeholder for retrieving CVs as images
     // It should return a stream of images associated with the user's CV
     http:Client mongoClient = check new (USER_HANDLER_SERVICE_URL);
@@ -53,7 +70,7 @@ public isolated function getCVasImages(string username) returns io:ReadableByteC
     return images;
 }
 
-public isolated function getCVImage(string path) returns error|http:Response{
+public isolated function getImage(string path) returns error|http:Response{
     // This function retrieves a specific CV image by its path
     http:Client fileClient = check new (FILE_HANDLER_SERVICE_URL,httpVersion = "1.1");
     http:Response response = check fileClient->get(path);
@@ -69,6 +86,16 @@ public isolated function getCVInfo(string username) returns ImageInfo|error {
     http:Client mongoClient = check new (USER_HANDLER_SERVICE_URL);
     json result = check mongoClient->/cv/getCV.get(params = { "user_name": username });
     string uuid = check result.uuid;
+    http:Client fileClient = check new (FILE_HANDLER_SERVICE_URL,httpVersion = "1.1");
+    ImageInfo info = check fileClient->get("/pdf/"+uuid);
+    return info;
+}
+
+public isolated function getdocInfo(string company_name) returns ImageInfo|error {
+    // This function retrieves the UUID of the user's CV
+    http:Client mongoClient = check new (USER_HANDLER_SERVICE_URL);
+    json result = check mongoClient->/cr/getCompanyRequest.get(params = { "company_name": company_name });
+    string uuid = check result.file_uuid;
     http:Client fileClient = check new (FILE_HANDLER_SERVICE_URL,httpVersion = "1.1");
     ImageInfo info = check fileClient->get("/pdf/"+uuid);
     return info;

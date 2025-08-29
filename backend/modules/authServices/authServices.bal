@@ -60,3 +60,21 @@ public isolated function register(User newUser) returns http:Response|error {
     http:Response response = check mongoClient->/user/registerUser.post(data);
     return response;
 }
+
+public isolated function getAllCompanyRequests() returns CompanyRequest[]|error{
+    http:Client mongoClient = check new (USER_HANDLER_SERVICE_URL);
+    CompanyRequest[] requests = check mongoClient->/cr/getAllCompanyRequests();
+    return requests;
+}
+
+public isolated function getCompanyRequest(string company_name) returns CompanyRequest|error{
+    http:Client mongoClient = check new (USER_HANDLER_SERVICE_URL);
+    CompanyRequest request = check mongoClient->/cr/getCompanyRequest(params = { "company_name": company_name });
+    return request;
+}
+
+public isolated function updateCompanyRequestStatus(string _id, string newStatus) returns http:Response|error {
+    http:Client mongoClient = check new (USER_HANDLER_SERVICE_URL);
+    http:Response response = check mongoClient->/cr/updateCompanyRequestStatus/[_id].put({status: newStatus});
+    return response;
+}
