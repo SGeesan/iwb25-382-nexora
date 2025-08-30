@@ -122,7 +122,9 @@ onMounted(() => {
             <span class="text-sm text-gray-400">Posted: {{ job.postedDate }}</span>
           </div>
         </div>
-        <p class="text-gray-300 mb-4">{{ job.description }}</p>
+        <p class="text-gray-300 mb-4 whitespace-pre-line">
+          {{ job.description }}
+        </p>
         <div class="flex flex-wrap gap-2">
           <span
             v-for="tag in job.tags"

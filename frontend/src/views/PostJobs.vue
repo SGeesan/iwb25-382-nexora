@@ -138,7 +138,7 @@ onMounted(() => {
             rows="6"
             required
             class="w-full px-4 py-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Provide a detailed description of the role, responsibilities, and qualifications."
+            placeholder="Provide a detailed description of the role, responsibilities, qualifications and contact information."
           ></textarea>
         </div>
 

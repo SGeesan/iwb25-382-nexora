@@ -95,7 +95,10 @@ onMounted(fetchJobs);
             <TrashIcon class="h-6 w-6" />
           </button>
         </div>
-        <p class="text-gray-300 mb-4">{{ job.description }}</p>
+        <p class="text-gray-300 mb-4 whitespace-pre-line">
+          {{ job.description }}
+        </p>
+
         <div class="flex flex-wrap gap-2">
           <span
             v-for="tag in job.tags"

@@ -13,6 +13,5 @@ echo Installing dependencies...
 echo .
 echo .
 echo .
-echo Check updates at https://github.com/sdmdg/vaultapp :)
 python main.py
 deactivate
