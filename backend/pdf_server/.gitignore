@@ -1,5 +1,5 @@
 __pycache__/
 /uploads
 /output
-/poppler-24.08.0/Library
-/poppler-24.08.0/share
+/poppler-24.08.0
+/venv

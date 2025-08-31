@@ -45,7 +45,7 @@ service / on mainListner {
         json password = check details.password;
         string userPassword = password.toString();
 
-        return auth:login(userEmail, userPassword);
+        return auth:login(userEmail, userPassword, ISSUER, AUDIENCE, PRIVATE_KEY_FILE);
     }
 
     isolated resource function post register(auth:User newUser) returns http:Response|error|error|http:Forbidden {
@@ -64,7 +64,7 @@ service / on mainListner {
     }
     isolated resource function post user/upload_cv(@http:Header string Authorization, http:Request request) returns http:Response|error {
         // This endpoint allows users to upload their CVs
-        string username = check util:get_username_from_BearerToken(Authorization); // Validate JWT and get username
+        string username = check util:get_username_from_BearerToken(Authorization,ISSUER,AUDIENCE,CERT_FILE); // Validate JWT and get username
         byte[] bytes = check request.getBinaryPayload();
         return file:uploadCV(bytes, username);
     }
@@ -74,7 +74,7 @@ service / on mainListner {
     }
     isolated resource function get user/get_cv_info(@http:Header string Authorization) returns file:ImageInfo|error {
         // This endpoint allows users to get their CV UUID
-        string username = check util:get_username_from_BearerToken(Authorization); // Validate JWT and get username
+        string username = check util:get_username_from_BearerToken(Authorization,ISSUER,AUDIENCE,CERT_FILE); // Validate JWT and get username
         return file:getCVInfo(username);
     }
 
@@ -91,7 +91,7 @@ service / on mainListner {
 
     isolated resource function get user/search_jobs(@http:Header string Authorization) returns jobs:Job[]|http:NotFound|error {
         // This endpoint allows users to search for jobs
-        string username = check util:get_username_from_BearerToken(Authorization); // Validate JWT and get username
+        string username = check util:get_username_from_BearerToken(Authorization,ISSUER,AUDIENCE,CERT_FILE); // Validate JWT and get username
         
         io:print("Searching jobs for user: ", username, "\n");
 
@@ -123,14 +123,14 @@ service / on mainListner {
     // ==== Company endpoints ====
     isolated resource function post company/upload_request(@http:Header string Authorization, http:Request request) returns http:Response|error {
         // This endpoint allows users to upload their CVs
-        string company_name = check util:get_username_from_BearerToken(Authorization); // Validate JWT and get username
+        string company_name = check util:get_username_from_BearerToken(Authorization,ISSUER,AUDIENCE,CERT_FILE); // Validate JWT and get username
         byte[] bytes = check request.getBinaryPayload();
         return file:uploadReqDoc(bytes, company_name);
     }
 
     isolated resource function get company/get_cr_status(@http:Header string Authorization) returns auth:CompanyRequest|error {
         // This endpoint allows users to get their CV UUID
-        string company_name = check util:get_username_from_BearerToken(Authorization); // Validate JWT and get username
+        string company_name = check util:get_username_from_BearerToken(Authorization,ISSUER,AUDIENCE,CERT_FILE); // Validate JWT and get username
         return auth:getCompanyRequest(company_name);
     }
     @http:ResourceConfig {
@@ -138,7 +138,7 @@ service / on mainListner {
     }
     isolated resource function post company/create_job(@http:Header string Authorization, jobs:JobPost newJob) returns http:Response|error {
         // This endpoint allows companies to create jobs
-        string username = check util:get_username_from_BearerToken(Authorization); // Validate JWT and get username
+        string username = check util:get_username_from_BearerToken(Authorization,ISSUER,AUDIENCE,CERT_FILE); // Validate JWT and get username
         return jobs:createJob(newJob, username);
     }
     
@@ -161,7 +161,7 @@ service / on mainListner {
     }
     isolated resource function get company/get_all_jobs(@http:Header string Authorization) returns jobs:Job[]|error {
         // This endpoint allows users to get all job tags
-        string username = check util:get_username_from_BearerToken(Authorization); // Validate JWT and get username
+        string username = check util:get_username_from_BearerToken(Authorization,ISSUER,AUDIENCE,CERT_FILE); // Validate JWT and get username
         return jobs:getAllJobsByCreator(username);
     }
 
@@ -178,7 +178,7 @@ service / on mainListner {
         auth: [{jwtValidatorConfig: validatorConfig, scopes: ["admin"]}]
     }
     isolated resource function get hello(@http:Header string Authorization) returns string|error {
-        string username = check util:get_username_from_BearerToken(Authorization);
+        string username = check util:get_username_from_BearerToken(Authorization,ISSUER,AUDIENCE,CERT_FILE);
         return "Hi " + username + ", this is a secured endpoint only for admins!";
     }
 
