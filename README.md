@@ -62,9 +62,8 @@ cd backend/pdf_server
 Create a virtual environment, activate it, and install dependencies:
 bash
 python -m venv venv
-venv\Scripts\activate  # Windows
-# or
-source venv/bin/activate  # Linux/macOS
+venv\Scripts\activate  # for Windows
+source venv/bin/activate  # for Linux/macOS
 pip install -r requirements.txt
 
 
