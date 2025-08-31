@@ -1,8 +1,15 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import Tag from "../models/Tag.js";
+import User from "../models/User.js";
+import Jobs from "../models/Job.js";
+import crypto from "crypto";
 
 dotenv.config();
+
+function md5Hash(password) {
+  return crypto.createHash("md5").update(password).digest("hex");
+}
 
 async function seed() {
   try {
@@ -71,7 +78,112 @@ async function seed() {
       console.log("TAG_MAIN updated");
     }
 
-    // ✅ Gracefully close connection
+    const users = [
+      {
+        user_name: "AdminUser",
+        email: process.env.ADMIN_EMAIL,
+        role: "admin",
+        password: process.env.ADMIN_PASSWORD,
+      },
+      {
+        user_name: "Nexora",
+        email: "company@example.com",
+        role: "company",
+        password: "company123",
+      },
+    ];
+
+    for (const u of users) {
+      const hashedPassword = md5Hash(u.password);
+      const existing = await User.findOne({ email: u.email });
+
+      if (!existing) {
+        await User.create({ ...u, password: hashedPassword });
+        console.log(`Created user: ${u.user_name}`);
+      } else {
+        await User.updateOne({ email: u.email }, { ...u, password: hashedPassword });
+        console.log(`Updated user: ${u.user_name}`);
+      }
+    }
+
+    const jobs = [
+      {
+        JobTitle: "Frontend Developer",
+        JobDescription: "Develop modern web applications using React, Vue, or Angular.",
+        CompanyName: "Nexora",
+        JobTags: ["JavaScript", "React", "UI/UX"]
+      },
+      {
+        JobTitle: "Backend Developer",
+        JobDescription: "Build APIs and manage server-side logic using Node.js or Python.",
+        CompanyName: "Nexora",
+        JobTags: ["Node.js", "Python", "REST"]
+      },
+      {
+        JobTitle: "Data Analyst",
+        JobDescription: "Analyze data and generate reports to support business decisions.",
+        CompanyName: "Nexora",
+        JobTags: ["Data Science", "SQL", "Excel"]
+      },
+      {
+        JobTitle: "DevOps Engineer",
+        JobDescription: "Maintain cloud infrastructure and CI/CD pipelines.",
+        CompanyName: "Nexora",
+        JobTags: ["Docker", "Kubernetes", "AWS", "CI/CD"]
+      },
+      {
+        JobTitle: "Machine Learning Engineer",
+        JobDescription: "Design and implement machine learning models.",
+        CompanyName: "Nexora",
+        JobTags: ["Python", "TensorFlow", "PyTorch", "Machine Learning"]
+      },
+      {
+        JobTitle: "UI/UX Designer",
+        JobDescription: "Create engaging user interfaces and experiences.",
+        CompanyName: "Nexora",
+        JobTags: ["UI/UX Design", "Figma", "Prototyping", "Wireframing"]
+      },
+      {
+        JobTitle: "Finance Analyst",
+        JobDescription: "Manage financial reporting, budgeting, and forecasting.",
+        CompanyName: "Nexora",
+        JobTags: ["Accounting", "Budgeting", "Financial Analysis", "Excel"]
+      },
+      {
+        JobTitle: "Project Manager",
+        JobDescription: "Plan, execute, and oversee projects using Agile methodology.",
+        CompanyName: "Nexora",
+        JobTags: ["Agile", "Scrum", "Leadership", "Project Planning"]
+      },
+      {
+        JobTitle: "Content Writer",
+        JobDescription: "Create engaging content for marketing and communication.",
+        CompanyName: "Nexora",
+        JobTags: ["Communication", "Creativity", "Time Management", "Public Speaking"]
+      },
+      {
+        JobTitle: "Mechanical Engineer",
+        JobDescription: "Design and maintain mechanical systems and equipment.",
+        CompanyName: "Nexora",
+        JobTags: ["AutoCAD", "SolidWorks", "HVAC Systems", "Maintenance"]
+      }
+    ];    
+
+    for (const j of jobs) {
+      const existingJob = await Jobs.findOne({ JobTitle: j.JobTitle, CompanyName: j.CompanyName });
+      if (!existingJob) {
+        await Jobs.create(j);
+        console.log(`Created job: ${j.JobTitle}`);
+      } else {
+        await Jobs.updateOne(
+          { JobTitle: j.JobTitle, CompanyName: j.CompanyName },
+          j
+        );
+        console.log(`Updated job: ${j.JobTitle}`);
+      }
+    }
+
+    // Gracefully close connection
     await mongoose.disconnect();
     console.log("MongoDB disconnected, seeding complete");
   } catch (err) {
