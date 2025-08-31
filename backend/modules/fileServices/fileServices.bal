@@ -59,10 +59,10 @@ public isolated function getPDFasImages(string username) returns io:ReadableByte
     // io:println(uuid);
     http:Client fileClient = check new (FILE_HANDLER_SERVICE_URL,httpVersion = "1.1");
     ImageInfo info = check fileClient->get("/pdf/"+uuid);
-    io:println(info.images);
+    // io:println(info.images);
     io:ReadableByteChannel[] images = [];
     foreach string path in info.images {
-        io:println("call the endpoint:", path);
+        // io:println("call the endpoint:", path);
         http:Response response = check fileClient->get(path);
         byte[] imageBytes = check response.getBinaryPayload();
         images.push(check io:createReadableChannel(imageBytes));

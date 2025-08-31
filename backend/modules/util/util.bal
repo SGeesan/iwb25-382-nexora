@@ -3,11 +3,7 @@ import ballerina/jwt;
 import ballerina/crypto;
 import ballerina/mime;
 import BalService.jobServices as jobs;
-configurable string ISSUER = "nexora";
-configurable string AUDIENCE = "client";
-configurable string CERT_FILE = "./resource/alice.crt";
-configurable string PRIVATE_KEY_FILE = "./resource/alice.key";
-public isolated function get_username_from_BearerToken(string token) returns string|error {
+public isolated function get_username_from_BearerToken(string token,string ISSUER,string AUDIENCE, string CERT_FILE) returns string|error {
     http:JwtValidatorConfig validatorConfig = {
     issuer: ISSUER,
     audience: AUDIENCE,

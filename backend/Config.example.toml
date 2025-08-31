@@ -1,0 +1,19 @@
+[BalService]
+PORT = 9090 # Ballerina service port
+ISSUER = "nexora"
+AUDIENCE = "client"
+CERT_FILE = "./resource/alice.crt" # Path to the public key certificate
+PRIVATE_KEY_FILE = "./resource/alice.key" # Path to the private key file
+# We have provided sample keys in the resource folder for testing purposes.
+
+[BalService.authServices]
+USER_HANDLER_SERVICE_URL = "http://localhost:5000/api" # User management service URL(mongo_server[Node.js])
+# You may use the same URL in local testing, otherwise change it to the deployed user service URL.(Ex:- https://user-service.example.com/api) 
+
+[BalService.fileServices]
+USER_HANDLER_SERVICE_URL = "http://localhost:5000/api" # Please use the same user service URL as above.
+FILE_HANDLER_SERVICE_URL = "http://localhost:8000" # File management service URL(file_server[Python FastAPI])
+# You may use the same URL in local testing, otherwise change it to the deployed file service URL.(Ex:- https://file-service.example.com)
+
+[BalService.llmServices]
+GOOGLE_API_KEY = "Your_Google_API_key_here" # Google API key for LLM services
