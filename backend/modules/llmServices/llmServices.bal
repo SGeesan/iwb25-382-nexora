@@ -53,7 +53,7 @@ public isolated function rankJobs(jobs:Job[] jobList, json cv) returns jobs:Job[
     string? res = response.candidates[0].content.parts[0].text;
     jobs:Job[] rankedList = [];
     if res is string {
-        io:println("Response from LLM: " + res);
+        // io:println("Response from LLM: " + res);
         json jsonData = check res.fromJsonString();
         string[] jobIds = check jsonData.fromJsonWithType();
         foreach string jobId in jobIds {
