@@ -32,6 +32,7 @@ const tagSchema = new mongoose.Schema(
           default: [],
         },
       },
+      Name:{ type: String, unique: true }
     },
     { collection: "Tags" }
   );
